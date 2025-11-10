@@ -1,11 +1,11 @@
 class Environmental():
     def __init__(self, name, description):
-        self.__name = name
-        self.__description = description
+        self.name = name
+        self.description = description
         self.is_equippable = False
     
     def get_name(self):
-        return self.__name
+        return self.name
 
     def get_description(self):
-        return self.__description
+        return self.description

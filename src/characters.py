@@ -14,6 +14,8 @@ class Combatant(Environmental):
         self.off_equip = None
         self.chest_equip = None
         self.is_conscious = True
+        self.weaknesses = []
+        self.resistances = []
 
     def get_max_hp(self):
         return self.max_hp
@@ -75,13 +77,16 @@ class Combatant(Environmental):
     def take_damage(self, amount):
         self.current_hp -= amount
         if self.current_hp <= 0:
-            self.is_conscious = False
+            self.fall_unconscious()
         
     def use_mp(self, amount):
         if amount >= self.current_mp:
             raise Exception("Cannot spend more mp than one has.")
         
         self.current_mp -= amount
+
+    def fall_unconscious(self):
+        self.is_conscious = False
 
     def __repr__(self):
         return f"\n----------\nCombatant: {self.get_name()}\nDescription: {self.get_description()}\n\nJob: {self.get_job().capitalize()}\n\nHP: {self.get_current_hp()} / {self.get_max_hp()}\nMP: {self.get_current_mp()} / {self.get_max_mp()}\n----------\n"
