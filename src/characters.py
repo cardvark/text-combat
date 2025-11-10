@@ -4,33 +4,37 @@ from src.environmentals import Environmental
 class Combatant(Environmental):
     def __init__(self, name, description, level, job):
         super().__init__(name, description)
-        self.__level = level
-        self.__job = job
-        self.__max_hp = scs.calc_max_hp(level, self.__job)
-        self.__max_mp = scs.calc_max_mp(level, self.__job)
-        self.__current_hp = self.__max_hp
-        self.__current_mp = self.__max_mp
+        self.level = level
+        self.job = job
+        self.max_hp = scs.calc_max_hp(level, self.job)
+        self.max_mp = scs.calc_max_mp(level, self.job)
+        self.current_hp = self.max_hp
+        self.current_mp = self.max_mp
         self.main_equip = None
         self.off_equip = None
         self.chest_equip = None
+        self.is_conscious = True
 
     def get_max_hp(self):
-        return self.__max_hp
+        return self.max_hp
 
     def get_max_mp(self):
-        return self.__max_mp
+        return self.max_mp
 
     def get_current_hp(self):
-        return self.__current_hp
+        return self.current_hp
     
     def get_current_mp(self):
-        return self.__current_mp
+        return self.current_mp
 
     def get_job(self):
-        return self.__job
+        return self.job
 
     def equip_item(self, equipment):
         old_equipment = None
+
+        if not equipment.is_equippable:
+            raise Exception("Not an equippable item.")
 
         match equipment.equip_type:
             case "weapon":
@@ -59,6 +63,25 @@ class Combatant(Environmental):
         equipment = self.chest_equip
         self.chest_equip = None        
         return equipment
+
+    def restore_hp(self, amount):
+        restored_hp = min(self.current_hp + amount, self.max_hp)
+        self.current_hp = restored_hp
+
+    def restore_mp(self, amount):
+        restored_mp = min(self.current_mp + amount, self.max_mp)
+        self.current_mp = restored_mp
+
+    def take_damage(self, amount):
+        self.current_hp -= amount
+        if self.current_hp <= 0:
+            self.is_conscious = False
+        
+    def use_mp(self, amount):
+        if amount >= self.current_mp:
+            raise Exception("Cannot spend more mp than one has.")
+        
+        self.current_mp -= amount
 
     def __repr__(self):
         return f"\n----------\nCombatant: {self.get_name()}\nDescription: {self.get_description()}\n\nJob: {self.get_job().capitalize()}\n\nHP: {self.get_current_hp()} / {self.get_max_hp()}\nMP: {self.get_current_mp()} / {self.get_max_mp()}\n----------\n"

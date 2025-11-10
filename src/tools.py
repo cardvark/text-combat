@@ -5,6 +5,7 @@ class Equipment(Environmental):
     def __init__(self, name, description, equip_type):
         super().__init__(name, description)
         self.equip_type = equip_type
+        self.is_equippable = True
 
 
 class Weapon(Equipment):
@@ -13,13 +14,12 @@ class Weapon(Equipment):
         self.weapon_type = weapon_type
         self.damage_type = damage_type
         self.base_damage = base_damage
-    
+
+
 
 class Potion(Environmental):
-    def __init__(self, name, description, potion_type):
+    def __init__(self, name, description, potion_type, amount):
         super().__init__(name, description)
         self.potion_type = potion_type
-        self.efficacy = get_potion_efficacy(potion_type)
-    
-    def quaff(self, user):
-        pass
+        self.amount = amount
+
