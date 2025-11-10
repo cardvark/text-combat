@@ -26,13 +26,13 @@ def calc_max_hp(level, job):
         base_hp = 30
         hp_per_level = 5
         job_modifier = hp_modifiers[job]
-        return int(base_hp * hp_per_level * job_modifier)
+        return int((base_hp + hp_per_level * level) * job_modifier)
 
 def calc_max_mp(level, job):
         base_mp = 25
         mp_per_level = 3
         job_modifier = mp_modifiers[job]
-        return int(base_mp * mp_per_level * job_modifier)
+        return int((base_mp + mp_per_level * level) * job_modifier)
 
 def calculate_hit(character, target):
     # TBD. Can add more stats to add some variability.

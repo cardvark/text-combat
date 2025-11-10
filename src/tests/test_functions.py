@@ -26,16 +26,17 @@ class TestCharacters(unittest.TestCase):
         print("\n\nPrinting basic attack.")
         player1 = Combatant("Bob", "A vaguely nebbish creature.", 5, "fighter")
         player2 = Combatant("Maria", "A comely young woman.", 4, "mage")
-        long_sword = Weapon("long sword", "A steel sword of some quality.", "sword", "slashing", 20)
-        stick = Weapon("stick", "A sad, sickly little twig of a weapon.", "mace", "blunt", 10)
+        long_sword = Weapon("long sword", "A steel sword of some quality.", "sword", "slashing", 10)
+        stick = Weapon("stick", "A sad, sickly little twig of a weapon.", "mace", "blunt", 2)
         player1.equip_item(stick)
         player2.equip_item(long_sword)
 
-        i = 1
+        i = 0
 
         players = [player1, player2]
 
         while (player2.is_conscious and player1.is_conscious):
+            i += 1
             print(f"\n\nTurn {i}.")
 
             if i % 2 == 1:
@@ -44,12 +45,12 @@ class TestCharacters(unittest.TestCase):
             else:
                 player = player2
                 target = player1
-
+            
             print(f"{player.get_name()} attacks {target.get_name()} with a {player.main_equip.name}.")
 
             if not check_hit(player, target):
                 print(f"{player.name} misses!")
-                pass
+                continue
 
             damage = deal_damage(player, target)
 
@@ -58,7 +59,6 @@ class TestCharacters(unittest.TestCase):
             if not target.is_conscious:
                 print(f"{target.name} has been rendered unconscious!")
 
-            i += 1
 
     def test_resistances(self):
         pass

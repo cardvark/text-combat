@@ -19,7 +19,7 @@ class TestCharacters(unittest.TestCase):
         max_hp = player1.get_current_hp()
         expected_current_hp = max_hp
 
-        self.assertEqual(expected_current_hp, 180)
+        self.assertEqual(expected_current_hp, 66)
 
         damage1 = 50
         expected_current_hp -= damage1
