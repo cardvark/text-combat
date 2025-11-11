@@ -54,8 +54,8 @@ def player_selection(player_choice, inventory, player, enemy):
             if not item:
                 return False
             
-            print(f"Used {item.name}")
-
+            message = use_consumable(player, item)
+            print(message)
             return True
         case "3":
             print("There is no fleeing from this fight.")

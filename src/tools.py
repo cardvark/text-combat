@@ -19,6 +19,7 @@ class Weapon(Equipment):
 class Potion(Environmental):
     def __init__(self, name, description, potion_type, amount):
         super().__init__(name, description)
-        self.potion_type = potion_type
+        self.is_potion = True
+        self.consumable_type = potion_type
         self.amount = amount
         self.is_consumable = True
