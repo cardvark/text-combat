@@ -8,9 +8,6 @@ def use_potion(inventory, character, potion):
     
     inventory.remove(potion)
 
-def check_inventory(inventory, item):
-    return item in inventory
-
 def check_hit(character, target):
     return scs.calculate_hit(character, target)
 

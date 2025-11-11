@@ -22,4 +22,4 @@ class Potion(Environmental):
         super().__init__(name, description)
         self.potion_type = potion_type
         self.amount = amount
-
+        self.is_consumable = True

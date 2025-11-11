@@ -51,7 +51,7 @@ def player_turn(inventory, player, enemy):
         for k, v in sorted(options.items()):
             prompt += f"[{k}] {v}\n"
 
-        prompt += ">> "
+        prompt += "\n>> "
         
         player_choice = input(prompt)
 
@@ -114,4 +114,5 @@ def print_status(player, enemy):
 
     print(f"You have {player.current_hp} out of {player.max_hp} HPs.")
     print(f"Your opponent appears {enemy_status}.")
+    print()
 
