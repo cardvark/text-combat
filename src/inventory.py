@@ -8,10 +8,16 @@ class Inventory:
     def get_contents(self):
         return self.bag
 
-    def get_item_list(self):
+    def get_item_list(self, flag=None):
         tups_list = []
+        
+        match flag:
+            case "consumable":
+                bag = self.get_consumables()
+            case _:
+                bag = self.bag
 
-        for item in self.bag:
+        for item in bag:
             uid = item.uid
             name = item.name
             description = item.description

@@ -35,6 +35,31 @@ def damage_flavor(original_hp_perc, new_hp_perc):
     if flavor:
         print(flavor)
     
+
+def player_selection(player_choice, inventory, player, enemy):
+    match player_choice:
+        case "1":
+            print(f"You attack the {enemy.name}.")
+            damage = player_attack(player, enemy)
+
+            if damage != None:
+                print(f"You hit your opponent squarely, dealing {damage} damage.")
+            
+            return True
+
+        case "2":
+            # TODO complete item usage
+            item = inventory_selection(inventory)
+            
+            if not item:
+                return False
+            
+            print(f"Used {item.name}")
+
+            return True
+        case "3":
+            print("There is no fleeing from this fight.")
+            return True
     
 
 def player_turn(inventory, player, enemy):
@@ -56,26 +81,83 @@ def player_turn(inventory, player, enemy):
         player_choice = input(prompt)
 
         if player_choice in options:
+            result = player_selection(player_choice, inventory, player, enemy)
+            
+            if not result:
+                continue
             break
         else:
             print("Select one of the options.")
 
-    match player_choice:
-        case "1":
-            print(f"You attack the {enemy.name}.")
-            damage = player_attack(player, enemy)
-
-            if damage != None:
-                print(f"You hit your opponent squarely, dealing {damage} damage.")
-            
-        case "2":
-            # TODO 
-            print("working on this.")
-            pass
-        case "3":
-            print("There is no fleeing from this fight.")
-            pass
         
+def aggregate_inventory_items(items):
+    count_dict_with_ids = {}
+
+    for item in items:
+        if item.name in count_dict_with_ids:
+            count_dict_with_ids[item.name][0] += 1
+            count_dict_with_ids[item.name][1].append(item.uid)
+        else:
+            count_dict_with_ids[item.name] = [1, [item.uid]]
+        
+    return count_dict_with_ids
+
+def display_inventory_items(aggregated_items):
+    # not used currently.
+    print_output = "Your inventory contains:\n"
+    for item_name, count in sorted(aggregated_items.items()):
+        print_output += f"{item_name} x{count}\n"
+    
+    print(print_output)
+
+
+def inventory_selection(inventory):
+    while True:
+        consumables = inventory.get_consumables()
+        if not consumables:
+            print("No usable items found!")
+
+        aggregated_consumables = aggregate_inventory_items(consumables)
+    
+        i = 1
+        selections = {}
+        
+        prompt = "Your usable items include: \n"
+        for item_name, value in sorted(aggregated_consumables.items()):
+            prompt += f"[{i}] {item_name} x{value[0]}\n"
+            selections[str(i)] = value[1] # ties number selection to list of UIDs.
+            i += 1
+
+        prompt += f"[{i}] Return to previous menu.\n"
+        selections[str(i)] = []
+
+        prompt += "\n>> "
+        
+        player_choice = input(prompt)
+
+        if player_choice in selections:
+            break
+        else:
+            print("Select one of the items.")
+
+    if not consumables:
+        return None
+
+        
+    if player_choice == str(i):
+        return None
+
+    item_id = selections[player_choice][0]
+    
+    retrieved_item = inventory.get_item_by_id(item_id)
+
+    return retrieved_item
+
+
+
+    
+    
+
         
 def player_attack(player, enemy):
     if not check_hit(player, enemy):

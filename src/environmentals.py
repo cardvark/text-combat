@@ -5,6 +5,7 @@ class Environmental():
         self.name = name
         self.description = description
         self.is_equippable = False
+        self.is_consumable = False
         self.uid = uuid.uuid4()
     
     def get_name(self):

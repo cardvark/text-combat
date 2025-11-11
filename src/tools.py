@@ -16,7 +16,6 @@ class Weapon(Equipment):
         self.base_damage = base_damage
 
 
-
 class Potion(Environmental):
     def __init__(self, name, description, potion_type, amount):
         super().__init__(name, description)

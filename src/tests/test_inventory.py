@@ -76,3 +76,23 @@ class TestInventory(unittest.TestCase):
                 4,
                 len(inventory.get_item_list())
             )
+        
+    def test_potions_only(self):
+        print("\n\nTesting consumables only flag")
+
+        inventory = self.generate_full_inventory()
+        consumables = inventory.get_consumables()
+        consumables_item_list = inventory.get_item_list(flag="consumable")
+
+        with self.subTest():
+            self.assertEqual(
+                4,
+                len(consumables)
+            )
+        with self.subTest():
+            self.assertEqual(
+                4,
+                len(consumables_item_list)
+            )
+
+        

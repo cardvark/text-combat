@@ -2,6 +2,7 @@ from src.characters import Combatant
 from src.tools import *
 from src.player_functions import *
 from src.combat_sim import *
+from src.inventory import Inventory
 import time
 
 def main():
@@ -13,12 +14,16 @@ def main():
     small_heal = Potion("small healing potion", "A small vial of a wan red liquid.", "healing", 25)
     med_heal = Potion("large healing potion", "A vial of a bright red liquid.", "healing", 50)
 
-    inventory = [
+    inventory = Inventory(10)
+    items_list = [
        stick,
        long_sword,
        small_heal,
        med_heal
     ]
+
+    for item in items_list:
+        inventory.add_item(item)
 
     player1.equip_item(stick)
     player2.equip_item(long_sword)
