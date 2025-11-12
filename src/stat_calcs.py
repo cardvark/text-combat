@@ -1,5 +1,13 @@
 import random
 
+BASE_HP = 30
+BASE_MP = 25
+HP_PER_LEVEL = 5
+MP_PER_LEVEL = 3
+MISS_CHANCE = 0.125
+BASE_DAMAGE_MODIFIER = 1
+BASE_CHAR_DAMAGE = 5
+
 jobs_list = [
     "fighter",
     "mage",
@@ -23,21 +31,21 @@ mp_modifiers = {
 
 
 def calc_max_hp(level, job):
-        base_hp = 30
-        hp_per_level = 5
+        base_hp = BASE_HP
+        hp_per_level = HP_PER_LEVEL
         job_modifier = hp_modifiers[job]
         return int((base_hp + hp_per_level * level) * job_modifier)
 
 def calc_max_mp(level, job):
-        base_mp = 25
-        mp_per_level = 3
+        base_mp = BASE_MP
+        mp_per_level = MP_PER_LEVEL
         job_modifier = mp_modifiers[job]
         return int((base_mp + mp_per_level * level) * job_modifier)
 
 def calculate_hit(character, target):
     # TBD. Can add more stats to add some variability.
     hit = random.random()
-    return hit > 0.125
+    return hit > MISS_CHANCE
 
 def calculate_damage(character, target):
     char_weapon = character.main_equip
@@ -49,10 +57,10 @@ def calculate_damage(character, target):
         dmg_type = char_weapon.damage_type
 
     target_armor = target.chest_equip # does nothing yet.
-    char_damage = 5 # can make dependent on stats or something. TBD.
+    char_damage = BASE_CHAR_DAMAGE # can make dependent on stats or something. TBD.
     raw_total_damage = weapon_damage + char_damage
 
-    dmg_modifier = 1
+    dmg_modifier = BASE_DAMAGE_MODIFIER
 
     if dmg_type in target.weaknesses:
         dmg_modifier += 0.5
