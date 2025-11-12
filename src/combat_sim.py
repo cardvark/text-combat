@@ -3,7 +3,8 @@ from src.tools import *
 from src.player_functions import *
 import random
 
-def enemy_turn(player, enemy):
+def enemy_turn(enemy_inventory, player, enemy):
+    enemy.turn_increment()
     print(f"The {enemy.name} attacks!")
     original_hp_perc = player.current_hp / player.max_hp
     damage = enemy_attack(player, enemy)
@@ -14,6 +15,36 @@ def enemy_turn(player, enemy):
 
     new_hp_perc = player.current_hp / player.max_hp
     damage_flavor(original_hp_perc, new_hp_perc)
+
+
+def player_turn(inventory, player, enemy):
+    print_status(player, enemy)
+    player.turn_increment()
+
+    options = {
+        "1": "Attack",
+        "2": "Use an item",
+        "3": "Flee",
+    }
+
+    while True:
+        prompt = "Your options include: \n"
+        for k, v in sorted(options.items()):
+            prompt += f"[{k}] {v}\n"
+
+        prompt += "\n>> "
+        
+        player_choice = input(prompt)
+
+        if player_choice in options:
+            result = player_selection(player_choice, inventory, player, enemy)
+            
+            if not result:
+                continue
+            break
+        else:
+            print("Select one of the options.")
+
 
 def damage_flavor(original_hp_perc, new_hp_perc):
     damage_delta = original_hp_perc - new_hp_perc
@@ -62,33 +93,6 @@ def player_selection(player_choice, inventory, player, enemy):
             return True
     
 
-def player_turn(inventory, player, enemy):
-    print_status(player, enemy)
-
-    options = {
-        "1": "Attack",
-        "2": "Use an item",
-        "3": "Flee",
-    }
-
-    while True:
-        prompt = "Your options include: \n"
-        for k, v in sorted(options.items()):
-            prompt += f"[{k}] {v}\n"
-
-        prompt += "\n>> "
-        
-        player_choice = input(prompt)
-
-        if player_choice in options:
-            result = player_selection(player_choice, inventory, player, enemy)
-            
-            if not result:
-                continue
-            break
-        else:
-            print("Select one of the options.")
-
         
 def aggregate_inventory_items(items):
     count_dict_with_ids = {}
@@ -122,7 +126,7 @@ def inventory_selection(inventory):
         i = 1
         selections = {}
         
-        prompt = "Your usable items include: \n"
+        prompt = "Select an option: \n"
         for item_name, value in sorted(aggregated_consumables.items()):
             prompt += f"[{i}] {item_name} x{value[0]}\n"
             selections[str(i)] = value[1] # ties number selection to list of UIDs.
@@ -148,17 +152,10 @@ def inventory_selection(inventory):
         return None
 
     item_id = selections[player_choice][0]
-    
     retrieved_item = inventory.get_item_by_id(item_id)
-
     return retrieved_item
 
 
-
-    
-    
-
-        
 def player_attack(player, enemy):
     if not check_hit(player, enemy):
         print("You miss your attack!")

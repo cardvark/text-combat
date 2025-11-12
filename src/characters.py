@@ -16,6 +16,7 @@ class Combatant(Environmental):
         self.is_conscious = True
         self.weaknesses = []
         self.resistances = []
+        self.abilities = []
 
     def get_max_hp(self):
         return self.max_hp
@@ -88,6 +89,41 @@ class Combatant(Environmental):
     def fall_unconscious(self):
         self.is_conscious = False
 
+    def turn_increment(self, count=1):
+        # TODO should increment all abilities and proc any turn-based status effects. E.g., taking a tick of damage from poison.
+        # count is number of increments. Potentially enable a "hasted" effect that allows for more increments per turn.
+        
+        for ability in self.abilities:
+            if ability.cost_type == "turn_based":
+                ability.turn_increment()
+        
+
+    def learn_ability(self, ability):
+        self.abilities.append(ability)
+        self.abilities = sorted(
+            self.abilities,
+            key=lambda a: (a.effect_type, a.name)
+        )
+
+    def list_abilities(self):
+        abilities_list = []
+        for ability in self.abilities:
+            abilities_list.append(ability.name)
+        return abilities_list
+    
+    def reset_abilities(self):
+        for ability in self.abilities:
+            ability.reset()
+
+    def reset_battle_abilities(self):
+        # TODO  Have to test this, esp, the charge_based check.
+        for ability in self.abilities:
+            if ability.cost_type == "charge_based" and ability.reset_type == "daily":
+                print(f"Found a daily ability: {ability.name}")
+                continue
+            ability.reset()
+
     def __repr__(self):
         return f"\n----------\nCombatant: {self.get_name()}\nDescription: {self.get_description()}\n\nJob: {self.get_job().capitalize()}\n\nHP: {self.get_current_hp()} / {self.get_max_hp()}\nMP: {self.get_current_mp()} / {self.get_max_mp()}\n----------\n"
+        
 
