@@ -6,6 +6,11 @@ Effect types:
 * "buff"
 * "debuff"
 
+cost types:
+* turn_based
+* mp
+* charge_based
+
 """
 
 class Ability:
@@ -23,6 +28,18 @@ class Ability:
         self.effect_type = effect_type # healing, damaging, buffing, etc.
         self.effect_amount = effect_amount # int
         self.effect_target = effect_target # self, other
+
+    def use_ability(self):
+        pass
+    
+    def reset(self):
+        pass
+
+    def turn_increment(self, count=1):
+        pass
+
+    def check_ready(self):
+        pass
 
 
 class MPBased(Ability):
