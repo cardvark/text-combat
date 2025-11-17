@@ -1,17 +1,9 @@
 """
-Effect types:
-* "healing"
-* "damage"
-* "damage_multiplier"
-* "buff"
-* "debuff"
-
-cost types:
-* turn_based
-* mp
-* charge_based
+TODO: Change item / inventory to use enums.
 
 """
+
+from src.type_enums import *
 
 class Ability:
     def __init__(self, 
@@ -24,10 +16,11 @@ class Ability:
         ):
         self.name = name
         self.description = description
-        self.cost_type = cost_type # mp, turn_based, delayed_turn, charges
-        self.effect_type = effect_type # healing, damaging, buffing, etc.
+        self.cost_type = cost_type
+        self.effect_type = effect_type
         self.effect_amount = effect_amount # int
         self.effect_target = effect_target # self, other
+        self.reset_type = ResetType.BATTLE
 
     def use_ability(self):
         pass
@@ -52,7 +45,7 @@ class MPBased(Ability):
         effect_target,
         cost_modifier
         ):
-        super().__init__(name, description, "mp", effect_type, effect_amount, effect_target)
+        super().__init__(name, description, CostType.MP, effect_type, effect_amount, effect_target)
         self.base_mp_cost = int(mp_cost)
         self.current_mp_cost = self.base_mp_cost
         self.cost_modifier = cost_modifier
@@ -97,7 +90,7 @@ class TurnBased(Ability):
         effect_amount, 
         effect_target
         ):
-        super().__init__(name, description, "turn_based", effect_type, effect_amount, effect_target)
+        super().__init__(name, description, CostType.TURN, effect_type, effect_amount, effect_target)
         self.max_turns = max_turns
         self.turns_to_ready = 0
 
@@ -146,11 +139,11 @@ class ChargeBased(Ability):
         effect_target,
         reset_type
         ):
-        super().__init__(name, description, "charge_based", effect_type, effect_amount, effect_target)
+        super().__init__(name, description, CostType.CHARGE, effect_type, effect_amount, effect_target)
 
         self.total_charges = charges
         self.current_charges = charges
-        self.reset_type = reset_type # battle, daily
+        self.reset_type = reset_type
 
     def check_ready(self):
         return self.current_charges > 0

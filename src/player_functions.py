@@ -1,6 +1,7 @@
 from src.characters import *
 from src.tools import *
 import src.stat_calcs as scs
+from src.type_enums import *
 
 def check_hit(character, target):
     return scs.calculate_hit(character, target)

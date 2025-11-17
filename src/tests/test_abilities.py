@@ -14,9 +14,9 @@ class TestAbilities(unittest.TestCase):
             "second wind",
             "a self-heal ability",
             turns_to_ready,
-            "healing",
+            EffectType.HEALING,
             25,
-            "self",
+            TargetType.SELF,
             )
         with self.subTest():
             self.assertEqual(
@@ -72,9 +72,9 @@ class TestAbilities(unittest.TestCase):
             "second wind",
             "a self-heal ability",
             turns_to_ready,
-            "healing",
+            EffectType.HEALING,
             25,
-            "self",
+            TargetType.SELF,
             )
         
         with self.subTest():
@@ -109,10 +109,10 @@ class TestAbilities(unittest.TestCase):
             "cleave",
             "a massive, two-handed strike",
             3,
-            "damage_multiplier",
+            EffectType.DMG_MULT,
             2,
-            "other",
-            "battle"
+            TargetType.OTHER,
+            ResetType.BATTLE
         )
         
         charge_ability.use_ability()
@@ -163,40 +163,40 @@ class TestCharacterAbilities(unittest.TestCase):
             "second wind",
             "a self-heal ability",
             5,
-            "healing",
+            EffectType.HEALING,
             25,
-            "self",
+            TargetType.SELF,
             )
 
         cleave = ChargeBased(
             "cleave",
             "a massive, two-handed strike",
             2,
-            "damage_multiplier",
+            EffectType.DMG_MULT,
             2,
-            "other",
-            "battle"
+            TargetType.OTHER,
+            ResetType.BATTLE
         )
 
         rage = ChargeBased(
             "rage",
             "unrelenting, fathomless rage",
             2,
-            "buff",
+            EffectType.BUFF,
             1.5,
-            "self",
-            "daily"
+            TargetType.SELF,
+            ResetType.DAILY
         )
 
         lightning_ability = elementalMagic(
             "lightning bolt",
             "a lightning spell",
             20,
-            "damaging",
+            EffectType.DIRECT_DMG,
             25,
-            "other",
+            TargetType.OTHER,
             0.25,
-            "lightning"
+            ElementType.LIGHTNING,
         )
 
         player1 = Combatant("Bob", "A vaguely nebbish creature.", 5, "fighter")
@@ -207,7 +207,7 @@ class TestCharacterAbilities(unittest.TestCase):
         player1.learn_ability(lightning_ability)
 
         print(player1.list_abilities())
-        # ['rage', 'cleave', 'lightning bolt', 'second wind']
+        # ['rage', 'lightning bolt', 'cleave', 'second wind']
 
         player1.abilities
 
@@ -228,7 +228,7 @@ class TestCharacterAbilities(unittest.TestCase):
 
         with self.subTest():
             self.assertEqual(
-                player1.abilities[1].check_ready(),
+                player1.abilities[2].check_ready(),
                 True
             )
         

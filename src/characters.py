@@ -1,5 +1,6 @@
 import src.stat_calcs as scs
 from src.environmentals import Environmental
+from src.abilities import EffectType, CostType, ResetType
 
 class Combatant(Environmental):
     def __init__(self, name, description, level, job):
@@ -17,6 +18,8 @@ class Combatant(Environmental):
         self.weaknesses = []
         self.resistances = []
         self.abilities = []
+        self.buffs = []
+        self.debuffs = []
 
     def get_max_hp(self):
         return self.max_hp
@@ -90,19 +93,15 @@ class Combatant(Environmental):
         self.is_conscious = False
 
     def turn_increment(self, count=1):
-        # TODO should increment all abilities and proc any turn-based status effects. E.g., taking a tick of damage from poison.
-        # count is number of increments. Potentially enable a "hasted" effect that allows for more increments per turn.
-        
         for ability in self.abilities:
-            if ability.cost_type == "turn_based":
-                ability.turn_increment()
+            ability.turn_increment(count)
         
 
     def learn_ability(self, ability):
         self.abilities.append(ability)
         self.abilities = sorted(
             self.abilities,
-            key=lambda a: (a.effect_type, a.name)
+            key=lambda a: (a.effect_type.name, a.name)
         )
 
     def list_abilities(self):
@@ -116,12 +115,10 @@ class Combatant(Environmental):
             ability.reset()
 
     def reset_battle_abilities(self):
-        # TODO  Have to test this, esp, the charge_based check.
         for ability in self.abilities:
-            if ability.cost_type == "charge_based" and ability.reset_type == "daily":
-                print(f"Found a daily ability: {ability.name}")
-                continue
-            ability.reset()
+            if ability.reset_type == ResetType.BATTLE:
+                ability.reset()
+
 
     def __repr__(self):
         return f"\n----------\nCombatant: {self.get_name()}\nDescription: {self.get_description()}\n\nJob: {self.get_job().capitalize()}\n\nHP: {self.get_current_hp()} / {self.get_max_hp()}\nMP: {self.get_current_mp()} / {self.get_max_mp()}\n----------\n"

@@ -79,7 +79,6 @@ def player_selection(player_choice, inventory, player, enemy):
             return True
 
         case "2":
-            # TODO complete item usage
             item = inventory_selection(inventory)
             
             if not item:
