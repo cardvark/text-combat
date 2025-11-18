@@ -7,6 +7,7 @@ class EffectType(Enum):
     DMG_MULT = "damage multiplier"
     BUFF = "buff"
     DEBUFF = "debuff"
+    MP_DIRECT = "direct mp restore"
 
 class CostType(Enum):
     TURN = "turn based"

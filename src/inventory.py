@@ -12,7 +12,7 @@ class Inventory:
         tups_list = []
         
         match flag:
-            case "consumable":
+            case "consumables":
                 bag = self.get_consumables()
             case _:
                 bag = self.bag

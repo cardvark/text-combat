@@ -13,8 +13,8 @@ def main():
 
     stick = Weapon("stick", "A sad, sickly little twig of a weapon.", "mace", "blunt", 3)
     long_sword = Weapon("long sword", "A steel sword of some quality.", "sword", "slashing", 10)
-    small_heal = Potion("small healing potion", "A small vial of a wan red liquid.", "healing", 25)
-    med_heal = Potion("large healing potion", "A vial of a bright red liquid.", "healing", 50)
+    small_heal = Potion("small healing potion", "A small vial of a wan red liquid.", EffectType.HEAL_DIRECT, 25)
+    med_heal = Potion("large healing potion", "A vial of a bright red liquid.", EffectType.HEAL_DIRECT, 50)
 
     player_inventory = Inventory(10)
     enemy_inventory = Inventory(10)

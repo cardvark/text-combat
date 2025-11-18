@@ -1,6 +1,4 @@
 from src.characters import Combatant
-from src.tools import *
-from src.combat_functions import *
 import src.combat_functions as cf
 from enum import Enum
 import src.print_formatting as pf
@@ -118,7 +116,6 @@ def player_turn_selection(selection, inventory, player, enemy):
             if not chosen_ability:
                 return False
 
-            # TODO: Implement actually using abilities.
             outcome = cf.use_combatant_ability(player, chosen_ability, enemy)
 
             outcome_text = pf.format_ability_outcome_text(chosen_ability, outcome, enemy)
@@ -133,7 +130,8 @@ def player_turn_selection(selection, inventory, player, enemy):
             if not item:
                 return False
             
-            message = cf.use_consumable(player, item)
+            amount = cf.use_consumable(player, item)
+            message = pf.get_consumable_message(player, item, amount)
             print(message)
             return True
 
@@ -153,7 +151,9 @@ def ability_selection(player):
 
         print("Your abilities include:\n")
         print(table)
-        print(pf.get_return_to_previous_option(num_options))
+        # print(pf.get_return_to_previous_option(num_options))
+        print(pf.get_return_to_previous_table(table))
+        print(pf.get_table_bottom_border(table))
         player_choice = input("\n>> ")
 
         if player_choice == str(num_options):
@@ -172,18 +172,6 @@ def ability_selection(player):
 
     return chosen_ability
 
-        
-def aggregate_inventory_items(items):
-    count_dict_with_ids = {}
-
-    for item in items:
-        if item.name in count_dict_with_ids:
-            count_dict_with_ids[item.name][0] += 1
-            count_dict_with_ids[item.name][1].append(item.uid)
-        else:
-            count_dict_with_ids[item.name] = [1, [item.uid]]
-        
-    return count_dict_with_ids
 
 def display_inventory_items(aggregated_items):
     # not used currently.
@@ -199,40 +187,61 @@ def inventory_selection(inventory):
         consumables = inventory.get_consumables()
         if not consumables:
             print("No usable items found!")
+            return None
 
         aggregated_consumables = aggregate_inventory_items(consumables)
-    
-        i = 1
-        selections = {}
+        selection_dict = aggregated_inventory_selection_dict(aggregated_consumables)
+        num_options = len(selection_dict) + 1
         
-        prompt = "Select an option: \n"
-        for item_name, value in sorted(aggregated_consumables.items()):
-            prompt += f"[{i}] {item_name} x{value[0]}\n"
-            selections[str(i)] = value[1] # ties number selection to list of UIDs.
-            i += 1
+        print("Select an option: \n")
+        table = pf.get_inventory_table(selection_dict)
+        print(table)
+        print(pf.get_return_to_previous_table(table))
+        print(pf.get_table_bottom_border(table))
 
-        prompt += f"[{i}] Return to previous menu.\n"
-        selections[str(i)] = []
-
-        prompt += "\n>> "
+        prompt = "\n>> "
         
         player_choice = input(prompt)
 
-        if player_choice in selections:
+        if int(player_choice) == num_options:
+            # Player chose "return to previous" option.
+            return None
+
+        if player_choice in selection_dict:
             break
         else:
             print("Select one of the items.\n")
-
-    if not consumables:
-        return None
-
         
-    if player_choice == str(i):
-        return None
-
-    item_id = selections[player_choice][0]
+        
+    item_id = selection_dict[player_choice][2]
     retrieved_item = inventory.get_item_by_id(item_id)
     return retrieved_item
+
+
+def aggregated_inventory_selection_dict(aggregated_items):
+    selection_dict = {}
+    i = 1
+    for item_name, value_list in sorted(aggregated_items.items()):
+        count = value_list[0]
+        first_uid = value_list[1][0]
+        selection_dict[str(i)] = [item_name, count, first_uid]
+        i += 1
+
+    return selection_dict
+
+
+def aggregate_inventory_items(items):
+    count_dict_with_ids = {}
+
+    for item in items:
+        if item.name in count_dict_with_ids:
+            count_dict_with_ids[item.name][0] += 1
+            count_dict_with_ids[item.name][1].append(item.uid)
+        else:
+            count_dict_with_ids[item.name] = [1, [item.uid]]
+        
+    return count_dict_with_ids
+
 
 
 def player_attack(player, enemy):

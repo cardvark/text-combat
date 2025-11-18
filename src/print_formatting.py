@@ -1,4 +1,4 @@
-from prettytable import PrettyTable
+from prettytable import PrettyTable, TableStyle
 from src.type_enums import *
 
 def print_status(player, enemy):
@@ -69,6 +69,23 @@ def generate_options_from_list(item_list, go_back=False):
     
     return options
 
+
+def get_inventory_table(selection_dict):
+    table = PrettyTable()
+    table.field_names = ["#", "Name", "Count"]
+
+    for index, value_list in sorted(selection_dict.items()):
+        name = value_list[0]
+        count = value_list[1]
+        table.add_row([
+            f"[{index}]",
+            name,
+            count
+        ])
+    
+    return table
+
+
 def get_abilities_table(abilities_list):
     i = 1
 
@@ -93,8 +110,44 @@ def get_abilities_table(abilities_list):
 
     return table
 
+
+def get_return_to_previous_table(table):
+    table_string = table.get_string()
+    table_lines = table_string.split("\n")
+    table_width = len(table_lines[0])
+
+    index = len(table.rows) + 1
+
+    return_1 = f"[{index}]"
+    return_2 = "Return to the previous."
+
+    add_length = table_width - len(return_1) - len(return_2) - 7
+
+    return_2 += " " * add_length
+
+    return_table = PrettyTable()
+    return_table.add_row([
+       return_1,
+       return_2
+        ])
+    
+    return_table.set_style(TableStyle.MSWORD_FRIENDLY)
+    return_table.header = False
+    
+    return return_table
+
+
 def get_return_to_previous_option(index):
     return f"[{index}] Return to previous menu.\n"
+
+
+def get_table_bottom_border(table):
+    table_string = table.get_string()
+    table_lines = table_string.split("\n")
+    table_width = len(table_lines[0])
+
+    return "-" * table_width
+    
 
 
 def get_ability_status(ability):
@@ -150,4 +203,20 @@ def format_target_name(target_name, capitalize=False):
 
     return output
 
+def get_consumable_message(user, item, amount):
+    # TODO: Split this into separate functions. Use item vs. message generated.
+    # TODO: Switch to Enums for item types.
+    if not item.is_consumable:
+        raise Exception("Item is not a consumable.")
+
+    message = f"Used {item.name}, "
+
+    match item.consumable_type:
+        case EffectType.HEAL_DIRECT:
+            message += f"restoring {amount} HPs. Current HP: {user.current_hp} out of {user.max_hp}."
+        case EffectType.MP_DIRECT:
+            message += f"restoring {amount} MPs. Current MP: {user.current_mp} out of {user.max_mp}."
+        case _:
+            raise Exception("Consumable type not supported.")
     
+    return message

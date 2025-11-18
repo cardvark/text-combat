@@ -1,5 +1,3 @@
-from src.characters import *
-from src.tools import *
 import src.stat_calcs as scs
 from src.type_enums import *
 
@@ -7,7 +5,7 @@ def check_hit(character, target):
     return scs.calculate_hit(character, target)
 
 def deal_basic_attack_damage(character, target):
-    damage_dealt = calculate_basic_attack_damage(character, target)
+    damage_dealt = scs.calculate_basic_attack_damage(character, target)
     target.take_damage(damage_dealt)
     return damage_dealt
 
@@ -22,18 +20,17 @@ def use_consumable(user, item):
     if not item.is_consumable:
         raise Exception("Item is not a consumable.")
 
-    message = f"Used {item.name}, "
     amount = item.amount
 
     match item.consumable_type:
-        case "healing":
+        case EffectType.HEAL_DIRECT:
             user.restore_hp(amount)
-            message += f"restoring {amount} HPs. Current HP: {user.current_hp} out of {user.max_hp}."
-        case "mana":
+        case EffectType.MP_DIRECT:
             user.restore_mp(amount)
-            message += f"restoring {amount} MPs. Current MP: {user.current_mp} out of {user.max_mp}."
+        case _:
+            raise Exception("Consumable type not supported.")
     
-    return message
+    return amount
 
 def use_combatant_ability(user, ability, target):
     # Decided to externalize logic for how abilities are used.
@@ -52,7 +49,7 @@ def use_combatant_ability(user, ability, target):
             outcome = calculate_ability_damage(amount, ability.damage_type, target)
             target.take_damage(outcome)
         case EffectType.DMG_MULT:
-            outcome = calculate_basic_attack_damage(user, target, amount)
+            outcome = scs.calculate_basic_attack_damage(user, target, amount)
             target.take_damage(outcome)
         case EffectType.BUFF:
             pass

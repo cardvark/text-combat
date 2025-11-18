@@ -1,7 +1,5 @@
 """
 TODO: Change item / inventory to use enums.
-TODO: Need to fully think through using abilities.
-Considerations:
 
 """
 

@@ -14,12 +14,12 @@ class TestInventory(unittest.TestCase):
 
         for i in range(2):
             inventory.add_item(
-                Potion("small potion", "a small healing potion of dubious quality", "healing", 20)
+                Potion("small potion", "a small healing potion of dubious quality", EffectType.HEAL_DIRECT, 20)
             )
 
         for i in range(2):
             inventory.add_item(
-                Potion("medium potion", "a medium healing potion of reasonable quality", "healing", 50)
+                Potion("medium potion", "a medium healing potion of reasonable quality", EffectType.HEAL_DIRECT, 50)
             )
 
         for i in range(1):
@@ -59,12 +59,12 @@ class TestOptions(unittest.TestCase):
 
         for i in range(2):
             inventory.add_item(
-                Potion("small potion", "a small healing potion of dubious quality", "healing", 20)
+                Potion("small potion", "a small healing potion of dubious quality", EffectType.HEAL_DIRECT, 20)
             )
 
         for i in range(2):
             inventory.add_item(
-                Potion("medium potion", "a medium healing potion of reasonable quality", "healing", 50)
+                Potion("medium potion", "a medium healing potion of reasonable quality", EffectType.HEAL_DIRECT, 50)
             )
 
         for i in range(1):
