@@ -1,7 +1,7 @@
 import unittest
 from src.characters import Combatant
 from src.tools import *
-from src.player_functions import *
+from src.combat_functions import *
 from src.inventory import Inventory
 
 class TestInventory(unittest.TestCase):

@@ -1,6 +1,6 @@
 from src.characters import Combatant
 from src.tools import *
-from src.player_functions import *
+from src.combat_functions import *
 from src.combat_sim import *
 from src.inventory import Inventory
 from src.abilities import *

@@ -1,6 +1,7 @@
 from src.characters import Combatant
 from src.tools import *
-from src.player_functions import *
+from src.combat_functions import *
+import src.combat_functions as cf
 from enum import Enum
 import src.print_formatting as pf
 import random
@@ -112,27 +113,32 @@ def player_turn_selection(selection, inventory, player, enemy):
             return True
 
         case PlayerOptions.ABILITIES:
-            ability = ability_selection(player)
+            chosen_ability = ability_selection(player)
 
-            if not ability:
+            if not chosen_ability:
                 return False
-            
-            print(ability.name)
 
-            ability.use_ability()
             # TODO: Implement actually using abilities.
+            outcome = cf.use_combatant_ability(player, chosen_ability, enemy)
+
+            outcome_text = pf.format_ability_outcome_text(chosen_ability, outcome, enemy)
+            print(outcome_text)
+
+            return True
 
         case PlayerOptions.ITEMS:
+            # TODO: Clean up all the inventory stuff.
             item = inventory_selection(inventory)
             
             if not item:
                 return False
             
-            message = use_consumable(player, item)
+            message = cf.use_consumable(player, item)
             print(message)
             return True
 
         case PlayerOptions.FLEE:
+            #TODO Implement fleeing logic.
             print("There is no fleeing from this fight.")
             return True
     
@@ -230,15 +236,15 @@ def inventory_selection(inventory):
 
 
 def player_attack(player, enemy):
-    if not check_hit(player, enemy):
+    if not cf.check_hit(player, enemy):
         print("You miss your attack!")
         return None
     
-    return deal_basic_attack_damage(player, enemy)
+    return cf.deal_basic_attack_damage(player, enemy)
 
 def enemy_attack(player, enemy):
-    if not check_hit(enemy, player):
+    if not cf.check_hit(enemy, player):
         print(f"The {enemy.name} misses their attack!")
         return None
     
-    return deal_basic_attack_damage(enemy, player)
+    return cf.deal_basic_attack_damage(enemy, player)

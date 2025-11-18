@@ -1,7 +1,7 @@
 import unittest
 from src.characters import Combatant
 from src.tools import Weapon
-from src.player_functions import *
+from src.combat_functions import *
 from src.inventory import Inventory
 from src.combat_sim import *
 from src.type_enums import *

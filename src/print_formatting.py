@@ -117,3 +117,37 @@ def get_ability_status(ability):
             raise Exception("Ability cost type not recognized.")
 
     return ability_status
+
+def format_ability_outcome_text(ability, outcome, target):
+    output = ""
+    output += f"You used {ability.name}!"
+    target_name = "yourself" if ability.effect_target == TargetType.SELF else target.name
+    output += "\n"
+
+    match ability.effect_type:
+        case EffectType.DIRECT_DMG | EffectType.DMG_MULT:
+            target_name = format_target_name(target_name, True)
+            output += f"{target_name} took {outcome} damage!"
+        case EffectType.BUFF:
+            pass
+        case EffectType.DEBUFF:
+            pass
+        case EffectType.HEAL_DIRECT | EffectType.HEAL_PERCENT:
+            output += f"You healed {target_name} for {outcome} HPs."
+        case _:
+            raise Exception("Ability EffectType not found.")
+
+    return output
+
+def format_target_name(target_name, capitalize=False):
+    output = target_name
+
+    if not target_name[0].isupper():
+        output = f"the {target_name}"
+
+        if capitalize:
+            output = output.capitalize()
+
+    return output
+
+    

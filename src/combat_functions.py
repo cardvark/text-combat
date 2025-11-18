@@ -17,6 +17,8 @@ def get_consumables_item_list(inventory):
     return consumables_item_list
 
 def use_consumable(user, item):
+    # TODO: Split this into separate functions. Use item vs. message generated.
+    # TODO: Switch to Enums for item types.
     if not item.is_consumable:
         raise Exception("Item is not a consumable.")
 
@@ -33,7 +35,10 @@ def use_consumable(user, item):
     
     return message
 
-def use_combatant_ability(user, ability, target=None):
+def use_combatant_ability(user, ability, target):
+    # Decided to externalize logic for how abilities are used.
+    # The "effect_type" determines the calculation, provided here.
+    
     if user != ability.user:
         raise Exception("User cannot use this ability.")
 
