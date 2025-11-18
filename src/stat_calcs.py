@@ -47,7 +47,7 @@ def calculate_hit(character, target):
     hit = random.random()
     return hit > MISS_CHANCE
 
-def calculate_damage(character, target):
+def calculate_basic_attack_damage(character, target, dmg_mult=1):
     char_weapon = character.main_equip
     weapon_damage = 0
     dmg_type = "blunt"
@@ -60,7 +60,7 @@ def calculate_damage(character, target):
     char_damage = BASE_CHAR_DAMAGE # can make dependent on stats or something. TBD.
     raw_total_damage = weapon_damage + char_damage
 
-    dmg_modifier = BASE_DAMAGE_MODIFIER
+    dmg_modifier = BASE_DAMAGE_MODIFIER * dmg_mult
 
     if dmg_type in target.weaknesses:
         dmg_modifier += 0.5
@@ -70,3 +70,23 @@ def calculate_damage(character, target):
     
     total_damage = random.uniform(raw_total_damage / 2, raw_total_damage * 1.5) * dmg_modifier
     return int(total_damage)
+
+def calculate_dmg_mult_ability_damage(ability, user, target):
+    dmg_mult = ability.effect_amount
+    return calculate_basic_attack_damage(user, target, dmg_mult)
+
+
+def calculate_ability_damage(base_damage, damage_type, target):
+    target_armor = target.chest_equip # does nothing yet.
+
+    dmg_modifier = BASE_DAMAGE_MODIFIER
+
+    if damage_type in target.weaknesses:
+        dmg_modifier += 0.5
+    
+    if dmg_type in target.resistances:
+        dmg_modifier += -0.5
+    
+    total_damage = random.uniform(raw_total_damage / 2, raw_total_damage * 1.5) * dmg_modifier
+    return int(total_damage)
+    

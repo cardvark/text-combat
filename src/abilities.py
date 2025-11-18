@@ -1,5 +1,7 @@
 """
 TODO: Change item / inventory to use enums.
+TODO: Need to fully think through using abilities.
+Considerations:
 
 """
 
@@ -21,6 +23,7 @@ class Ability:
         self.effect_amount = effect_amount # int
         self.effect_target = effect_target # self, other
         self.reset_type = ResetType.BATTLE
+        self.user = None
 
     def use_ability(self):
         pass
@@ -32,7 +35,7 @@ class Ability:
         pass
 
     def check_ready(self):
-        pass
+        return True
 
 
 class MPBased(Ability):
@@ -55,7 +58,9 @@ class MPBased(Ability):
 
     def reset(self):
         self.current_mp_cost = self.base_mp_cost
-
+    
+    def check_ready(self):
+        return self.current_mp_cost <= self.user.current_mp
 
 class elementalMagic(MPBased):
     def __init__(self,
@@ -78,7 +83,7 @@ class elementalMagic(MPBased):
             cost_modifier
         )
 
-        self.element = element
+        self.damage_type = element
 
 
 class TurnBased(Ability):

@@ -3,6 +3,8 @@ from src.tools import *
 from src.player_functions import *
 from src.combat_sim import *
 from src.inventory import Inventory
+from src.abilities import *
+from src.type_enums import *
 import time
 
 def main():
@@ -28,6 +30,40 @@ def main():
 
     player1.equip_item(stick)
     enemy_combatant.equip_item(long_sword)
+
+    second_wind = TurnBased(
+        "second wind",
+        "a self-heal ability",
+        5,
+        EffectType.HEAL_PERCENT,
+        0.25,
+        TargetType.SELF,
+        )
+    
+    cleave = ChargeBased(
+            "cleave",
+            "a massive, two-handed strike",
+            2,
+            EffectType.DMG_MULT,
+            2,
+            TargetType.OTHER,
+            ResetType.BATTLE
+        )
+
+    lightning_ability = elementalMagic(
+            "lightning bolt",
+            "a lightning spell",
+            20,
+            EffectType.DIRECT_DMG,
+            25,
+            TargetType.OTHER,
+            0.25,
+            ElementType.LIGHTNING,
+        )
+
+    player1.learn_ability(second_wind)
+    player1.learn_ability(cleave)
+    player1.learn_ability(lightning_ability)
 
     player_move = True
     while (player1.is_conscious and enemy_combatant.is_conscious):

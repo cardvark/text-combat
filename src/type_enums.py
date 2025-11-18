@@ -1,7 +1,8 @@
 from enum import Enum
 
 class EffectType(Enum):
-    HEALING = "healing"
+    HEAL_DIRECT = "direct heal"
+    HEAL_PERCENT = "percent heal"
     DIRECT_DMG = "damage"
     DMG_MULT = "damage multiplier"
     BUFF = "buff"

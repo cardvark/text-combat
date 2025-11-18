@@ -6,8 +6,8 @@ from src.type_enums import *
 def check_hit(character, target):
     return scs.calculate_hit(character, target)
 
-def deal_damage(character, target):
-    damage_dealt = calculate_damage(character, target)
+def deal_basic_attack_damage(character, target):
+    damage_dealt = calculate_basic_attack_damage(character, target)
     target.take_damage(damage_dealt)
     return damage_dealt
 
@@ -32,3 +32,36 @@ def use_consumable(user, item):
             message += f"restoring {amount} MPs. Current MP: {user.current_mp} out of {user.max_mp}."
     
     return message
+
+def use_combatant_ability(user, ability, target=None):
+    if user != ability.user:
+        raise Exception("User cannot use this ability.")
+
+    if ability.effect_target == TargetType.SELF:
+        target = user
+
+    amount = ability.effect_amount
+
+    match ability.effect_type:
+        case EffectType.DIRECT_DMG:
+            outcome = calculate_ability_damage(amount, ability.damage_type, target)
+            target.take_damage(outcome)
+        case EffectType.DMG_MULT:
+            outcome = calculate_basic_attack_damage(user, target, amount)
+            target.take_damage(outcome)
+        case EffectType.BUFF:
+            pass
+        case EffectType.DEBUFF:
+            pass
+        case EffectType.HEAL_DIRECT:
+            outcome = amount
+            target.restore_hp(amount)
+        case EffectType.HEAL_PERCENT:
+            outcome = int(amount * target.max_hp)
+            target.restore_hp(outcome)
+        case _:
+            raise Exception("Ability EffectType not found.")
+    
+    ability.use_ability()
+    return outcome
+

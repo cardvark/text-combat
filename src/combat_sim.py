@@ -1,7 +1,17 @@
 from src.characters import Combatant
 from src.tools import *
 from src.player_functions import *
+from enum import Enum
+import src.print_formatting as pf
 import random
+
+
+class PlayerOptions(Enum):
+    ATTACK = "Attack"
+    ABILITIES = "Abilities"
+    ITEMS = "Items"
+    FLEE = "Flee"
+
 
 def enemy_turn(enemy_inventory, player, enemy):
     enemy.turn_increment()
@@ -16,34 +26,57 @@ def enemy_turn(enemy_inventory, player, enemy):
     new_hp_perc = player.current_hp / player.max_hp
     damage_flavor(original_hp_perc, new_hp_perc)
 
-
-def player_turn(inventory, player, enemy):
-    print_status(player, enemy)
-    player.turn_increment()
+def generate_player_options(player, inventory):
+    i = 1
 
     options = {
-        "1": "Attack",
-        "2": "Use an item",
-        "3": "Flee",
+        str(i): PlayerOptions.ATTACK,
     }
+
+    i += 1
+
+    if player.abilities:
+        options[str(i)] = PlayerOptions.ABILITIES
+        i += 1
+
+    if inventory.get_consumables():
+        options[str(i)] = PlayerOptions.ITEMS
+        i += 1
+
+    options[str(i)] = PlayerOptions.FLEE
+
+    return options
+
+
+def generate_choice_prompt(printable_options):
+    pass
+
+
+def player_turn(inventory, player, enemy):
+    pf.print_status(player, enemy)
+    player.turn_increment()
+
+    options = generate_player_options(player, inventory)
 
     while True:
         prompt = "Your options include: \n"
-        for k, v in sorted(options.items()):
-            prompt += f"[{k}] {v}\n"
+
+        prompt += pf.format_options_from_dict(options, True)
 
         prompt += "\n>> "
         
         player_choice = input(prompt)
 
         if player_choice in options:
-            result = player_selection(player_choice, inventory, player, enemy)
+            selection = options[player_choice]
+
+            result = player_turn_selection(selection, inventory, player, enemy)
             
             if not result:
-                continue
+                continue #TBD?
             break
         else:
-            print("Select one of the options.")
+            print("Select one of the options.\n")
 
 
 def damage_flavor(original_hp_perc, new_hp_perc):
@@ -67,9 +100,9 @@ def damage_flavor(original_hp_perc, new_hp_perc):
         print(flavor)
     
 
-def player_selection(player_choice, inventory, player, enemy):
-    match player_choice:
-        case "1":
+def player_turn_selection(selection, inventory, player, enemy):
+    match selection:
+        case PlayerOptions.ATTACK:
             print(f"You attack the {enemy.name}.")
             damage = player_attack(player, enemy)
 
@@ -78,7 +111,18 @@ def player_selection(player_choice, inventory, player, enemy):
             
             return True
 
-        case "2":
+        case PlayerOptions.ABILITIES:
+            ability = ability_selection(player)
+
+            if not ability:
+                return False
+            
+            print(ability.name)
+
+            ability.use_ability()
+            # TODO: Implement actually using abilities.
+
+        case PlayerOptions.ITEMS:
             item = inventory_selection(inventory)
             
             if not item:
@@ -87,10 +131,40 @@ def player_selection(player_choice, inventory, player, enemy):
             message = use_consumable(player, item)
             print(message)
             return True
-        case "3":
+
+        case PlayerOptions.FLEE:
             print("There is no fleeing from this fight.")
             return True
     
+
+def ability_selection(player):
+    while True:
+        abilities_list = player.get_abilities() # gets list of ability objects.
+        abilities_selection_dict = pf.generate_selection_dict(abilities_list) # Used to compare against player input in order to determine which ability was selected.
+        num_options = len(abilities_selection_dict) + 1
+
+        table = pf.get_abilities_table(abilities_list)
+
+        print("Your abilities include:\n")
+        print(table)
+        print(pf.get_return_to_previous_option(num_options))
+        player_choice = input("\n>> ")
+
+        if player_choice == str(num_options):
+            # player has chosen the "return to previous menu" option.
+            return None
+
+        if player_choice in abilities_selection_dict:
+            chosen_ability = abilities_selection_dict[player_choice]
+
+            if chosen_ability.check_ready():
+                break
+            else:
+                print("Ability not ready to use. Choose another option.\n")
+        else:
+            print("Select one of the options.\n")
+
+    return chosen_ability
 
         
 def aggregate_inventory_items(items):
@@ -141,7 +215,7 @@ def inventory_selection(inventory):
         if player_choice in selections:
             break
         else:
-            print("Select one of the items.")
+            print("Select one of the items.\n")
 
     if not consumables:
         return None
@@ -160,37 +234,11 @@ def player_attack(player, enemy):
         print("You miss your attack!")
         return None
     
-    return deal_damage(player, enemy)
+    return deal_basic_attack_damage(player, enemy)
 
 def enemy_attack(player, enemy):
     if not check_hit(enemy, player):
         print(f"The {enemy.name} misses their attack!")
         return None
     
-    return deal_damage(enemy, player)
-
-
-def print_status(player, enemy):
-    enemy_status_dict = {
-        0.9: "pristine and malevolent",
-        0.8: "barely scratched",
-        0.6: "bleeding, but hardly winded",
-        0.3: "tired, but determined",
-        0.15: "haggard, and panting heavily",
-        0.0: "on death's door",
-    }
-
-    enemy_hp_perc = enemy.current_hp / enemy.max_hp
-
-    enemy_status = "bland."
-
-    for k, v in sorted(enemy_status_dict.items(), reverse=True):
-        if k <= enemy_hp_perc:
-            enemy_status = v
-            break
-        
-
-    print(f"You have {player.current_hp} out of {player.max_hp} HPs.")
-    print(f"Your opponent appears {enemy_status}.")
-    print()
-
+    return deal_basic_attack_damage(enemy, player)

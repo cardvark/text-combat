@@ -98,17 +98,21 @@ class Combatant(Environmental):
         
 
     def learn_ability(self, ability):
+        ability.user = self
         self.abilities.append(ability)
         self.abilities = sorted(
             self.abilities,
             key=lambda a: (a.effect_type.name, a.name)
         )
 
-    def list_abilities(self):
+    def list_ability_names(self):
         abilities_list = []
         for ability in self.abilities:
             abilities_list.append(ability.name)
         return abilities_list
+
+    def get_abilities(self):
+        return self.abilities
     
     def reset_abilities(self):
         for ability in self.abilities:

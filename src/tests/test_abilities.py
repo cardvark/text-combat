@@ -14,7 +14,7 @@ class TestAbilities(unittest.TestCase):
             "second wind",
             "a self-heal ability",
             turns_to_ready,
-            EffectType.HEALING,
+            EffectType.HEAL_DIRECT,
             25,
             TargetType.SELF,
             )
@@ -72,7 +72,7 @@ class TestAbilities(unittest.TestCase):
             "second wind",
             "a self-heal ability",
             turns_to_ready,
-            EffectType.HEALING,
+            EffectType.HEAL_DIRECT,
             25,
             TargetType.SELF,
             )
@@ -146,6 +146,27 @@ class TestAbilities(unittest.TestCase):
                 3
             )
 
+    def test_inherited_mp_based(self):
+        lightning_ability = elementalMagic(
+            "lightning bolt",
+            "a lightning spell",
+            20,
+            EffectType.DIRECT_DMG,
+            25,
+            TargetType.OTHER,
+            0.25,
+            ElementType.LIGHTNING,
+        )
+    
+        lightning_ability.use_ability()
+
+        self.assertEqual(
+            lightning_ability.current_mp_cost,
+            int(1.25 * 20)
+        )
+
+
+
 
 class TestCharacterAbilities(unittest.TestCase):
 
@@ -163,7 +184,7 @@ class TestCharacterAbilities(unittest.TestCase):
             "second wind",
             "a self-heal ability",
             5,
-            EffectType.HEALING,
+            EffectType.HEAL_DIRECT,
             25,
             TargetType.SELF,
             )
@@ -255,3 +276,13 @@ class TestCharacterAbilities(unittest.TestCase):
                 player1.abilities[3].turns_to_ready,
                 3
             )
+
+        # print(player1.abilities[0].user)
+
+        with self.subTest():
+            self.assertEqual(
+                player1.abilities[0].user.name,
+                "Bob"
+            )
+        
+
