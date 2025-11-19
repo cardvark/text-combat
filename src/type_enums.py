@@ -29,3 +29,8 @@ class ElementType(Enum):
     WATER = "water"
     EARTH = "earth"
     LIGHTNING = "lightning"
+
+class DamageType(Enum):
+    SLASHING = "slashing"
+    PIERCING = "piercing"
+    BLUNT = "blunt"

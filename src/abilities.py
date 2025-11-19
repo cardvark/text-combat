@@ -1,8 +1,3 @@
-"""
-TODO: Change item / inventory to use enums.
-
-"""
-
 from src.type_enums import *
 
 class Ability:
@@ -12,7 +7,8 @@ class Ability:
         cost_type, 
         effect_type, 
         effect_amount, 
-        effect_target
+        effect_target,
+        damage_type=None,
         ):
         self.name = name
         self.description = description
@@ -22,6 +18,7 @@ class Ability:
         self.effect_target = effect_target # self, other
         self.reset_type = ResetType.BATTLE
         self.user = None
+        self.damage_type = damage_type
 
     def use_ability(self):
         pass
@@ -44,9 +41,10 @@ class MPBased(Ability):
         effect_type, 
         effect_amount, 
         effect_target,
-        cost_modifier
+        cost_modifier,
+        damage_type=None,
         ):
-        super().__init__(name, description, CostType.MP, effect_type, effect_amount, effect_target)
+        super().__init__(name, description, CostType.MP, effect_type, effect_amount, effect_target, damage_type)
         self.base_mp_cost = int(mp_cost)
         self.current_mp_cost = self.base_mp_cost
         self.cost_modifier = cost_modifier
@@ -78,10 +76,9 @@ class elementalMagic(MPBased):
             effect_type, 
             effect_amount, 
             effect_target,
-            cost_modifier
+            cost_modifier,
+            damage_type=element
         )
-
-        self.damage_type = element
 
 
 class TurnBased(Ability):
@@ -91,9 +88,10 @@ class TurnBased(Ability):
         max_turns,
         effect_type, 
         effect_amount, 
-        effect_target
+        effect_target,
+        damage_type=None,
         ):
-        super().__init__(name, description, CostType.TURN, effect_type, effect_amount, effect_target)
+        super().__init__(name, description, CostType.TURN, effect_type, effect_amount, effect_target,damage_type)
         self.max_turns = max_turns
         self.turns_to_ready = 0
 
@@ -123,13 +121,16 @@ class DelayBased(TurnBased):
         max_turns,
         effect_type, 
         effect_amount, 
-        effect_target
+        effect_target,
+        damage_type=None,
+        starting_delay=None,
         ):
-        super().__init__(name, description, max_turns, effect_type, effect_amount, effect_target)
-        self.turns_to_ready = self.max_turns
+        super().__init__(name, description, max_turns, effect_type, effect_amount, effect_target, damage_type)
+        self.starting_delay = starting_delay if starting_delay else self.max_turns
+        self.turns_to_ready = self.starting_delay
 
     def reset(self):
-        self.turns_to_ready = self.max_turns
+        self.turns_to_ready = self.starting_delay
 
 
 class ChargeBased(Ability):
@@ -140,9 +141,10 @@ class ChargeBased(Ability):
         effect_type,
         effect_amount,
         effect_target,
-        reset_type
+        reset_type,
+        damage_type=None,
         ):
-        super().__init__(name, description, CostType.CHARGE, effect_type, effect_amount, effect_target)
+        super().__init__(name, description, CostType.CHARGE, effect_type, effect_amount, effect_target, damage_type)
 
         self.total_charges = charges
         self.current_charges = charges

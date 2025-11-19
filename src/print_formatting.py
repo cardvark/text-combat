@@ -1,5 +1,6 @@
 from prettytable import PrettyTable, TableStyle
 from src.type_enums import *
+import random
 
 def print_status(player, enemy):
     # TODO: make enemy status part of the enemy's object that can be called as needed.
@@ -173,9 +174,8 @@ def get_ability_status(ability):
 
 def format_ability_outcome_text(ability, outcome, target):
     output = ""
-    output += f"You used {ability.name}!"
+    output += f"You used {ability.name}!\n"
     target_name = "yourself" if ability.effect_target == TargetType.SELF else target.name
-    output += "\n"
 
     match ability.effect_type:
         case EffectType.DIRECT_DMG | EffectType.DMG_MULT:
@@ -192,6 +192,31 @@ def format_ability_outcome_text(ability, outcome, target):
 
     return output
 
+def format_enemy_ability_outcome_text(ability, outcome, enemy):
+    output = ""
+    enemy_name = format_target_name(enemy.name, True)
+    output += f"{enemy_name} used {ability.name}!\n"
+    target_name = "themselves" if ability.effect_target == TargetType.SELF else "you"
+
+    match ability.effect_type:
+        case EffectType.DIRECT_DMG | EffectType.DMG_MULT:
+            target_name = format_target_name(target_name, True)
+            output += f"{target_name} took {outcome} damage!"
+        case EffectType.BUFF:
+            pass
+        case EffectType.DEBUFF:
+            pass
+        case EffectType.HEAL_DIRECT | EffectType.HEAL_PERCENT:
+            output += f"{enemy_name} healed {target_name}!"
+            # TODO when I fix enemy status flavor text, call it here, probably.
+
+            # output += f"You healed {target_name} for {outcome} HPs."
+        case _:
+            raise Exception("Ability EffectType not found.")
+
+    return output
+
+
 def format_target_name(target_name, capitalize=False):
     output = target_name
 
@@ -204,8 +229,6 @@ def format_target_name(target_name, capitalize=False):
     return output
 
 def get_consumable_message(user, item, amount):
-    # TODO: Split this into separate functions. Use item vs. message generated.
-    # TODO: Switch to Enums for item types.
     if not item.is_consumable:
         raise Exception("Item is not a consumable.")
 
@@ -220,3 +243,24 @@ def get_consumable_message(user, item, amount):
             raise Exception("Consumable type not supported.")
     
     return message
+
+
+def damage_flavor(original_hp_perc, new_hp_perc):
+    damage_delta = original_hp_perc - new_hp_perc
+
+    flavor = ""
+
+    if damage_delta > 0.25:
+        options = [
+            "You gasp with the shock of pain, clutching at the fresh wound in your side with a feeling of disbelief. ",
+            "Your head rings from the blow, and your enemy appears doubled in your vision for a long, lingering moment. ",
+        ]
+        flavor += random.choice(options)
+
+    if original_hp_perc > 0.2 and new_hp_perc <= 0.2:
+        flavor += "The world dims at the edges, and takes on a grainy aspect. The sharp pains have dulled, and some dim part of you recognizes that you are in deep trouble."
+    elif original_hp_perc > 0.5 and new_hp_perc <= 0.5:
+        flavor += "Your body flags under the onslaught, but you grip your weapon tighter, and face your opponent squarely, ready for more."
+
+    if flavor:
+        print(flavor)

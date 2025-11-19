@@ -3,6 +3,8 @@ import src.combat_functions as cf
 from enum import Enum
 import src.print_formatting as pf
 import random
+from src.command_enums import *
+import src.enemy_manager as em
 
 
 class PlayerOptions(Enum):
@@ -14,16 +16,14 @@ class PlayerOptions(Enum):
 
 def enemy_turn(enemy_inventory, player, enemy):
     enemy.turn_increment()
-    print(f"The {enemy.name} attacks!")
-    original_hp_perc = player.current_hp / player.max_hp
-    damage = enemy_attack(player, enemy)
-    if damage == None:
-        return
+    decision, chosen_object = enemy.get_combat_action(enemy_inventory, player)
 
-    print(f"The {enemy.name} strikes you with {enemy.main_equip.name}, dealing {damage} damage.")
-
-    new_hp_perc = player.current_hp / player.max_hp
-    damage_flavor(original_hp_perc, new_hp_perc)
+    if decision == Command.BASIC_ATTACK:
+        em.handle_basic_attack(enemy, player)
+    if decision == Command.USE_ABILITY:
+        em.handle_enemy_ability(enemy, chosen_object, player)
+    if decision == Command.USE_CONSUMABLE:
+        em.handle_enemy_item(enemy, enemy_inventory, chosen_object, player)
 
 def generate_player_options(player, inventory):
     i = 1
@@ -103,7 +103,7 @@ def player_turn_selection(selection, inventory, player, enemy):
     match selection:
         case PlayerOptions.ATTACK:
             print(f"You attack the {enemy.name}.")
-            damage = player_attack(player, enemy)
+            damage = cf.player_attack(player, enemy)
 
             if damage != None:
                 print(f"You hit your opponent squarely, dealing {damage} damage.")
@@ -124,7 +124,6 @@ def player_turn_selection(selection, inventory, player, enemy):
             return True
 
         case PlayerOptions.ITEMS:
-            # TODO: Clean up all the inventory stuff.
             item = inventory_selection(inventory)
             
             if not item:
@@ -137,8 +136,9 @@ def player_turn_selection(selection, inventory, player, enemy):
 
         case PlayerOptions.FLEE:
             #TODO Implement fleeing logic.
+            # Need to first implement a concept of location.
             print("There is no fleeing from this fight.")
-            return True
+            return False
     
 
 def ability_selection(player):
@@ -241,19 +241,3 @@ def aggregate_inventory_items(items):
             count_dict_with_ids[item.name] = [1, [item.uid]]
         
     return count_dict_with_ids
-
-
-
-def player_attack(player, enemy):
-    if not cf.check_hit(player, enemy):
-        print("You miss your attack!")
-        return None
-    
-    return cf.deal_basic_attack_damage(player, enemy)
-
-def enemy_attack(player, enemy):
-    if not cf.check_hit(enemy, player):
-        print(f"The {enemy.name} misses their attack!")
-        return None
-    
-    return cf.deal_basic_attack_damage(enemy, player)

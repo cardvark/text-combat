@@ -6,6 +6,9 @@ from src.inventory import Inventory
 from src.combat_sim import *
 from src.type_enums import *
 from src.abilities import *
+from src.print_formatting import *
+import src.tests.object_setup as obj
+import src.enemy_manager as em
 
 class TestInventory(unittest.TestCase):
 
@@ -75,7 +78,6 @@ class TestOptions(unittest.TestCase):
         return inventory
 
     def generate_player(self):
-        
         second_wind = TurnBased(
             "second wind",
             "a self-heal ability",
@@ -131,7 +133,7 @@ class TestOptions(unittest.TestCase):
 
         options = generate_player_options(player, inventory)
 
-        printable_options = get_printable_options_from_dict(options, True)
+        printable_options = format_options_from_dict(options, True)
 
         with self.subTest():
             self.assertEqual(
@@ -139,8 +141,45 @@ class TestOptions(unittest.TestCase):
                 printable_options,
             )
 
-    def test_abilities_lists(self):
-        player = self.generate_player()
-        get_player_ability_choice(player)
+    # def test_abilities_lists(self):
+    #     player = self.generate_player()
+    #     get_player_ability_choice(player)
 
     
+class TestEnemyBehavior(unittest.TestCase):
+    def test_enemy_decisions(self):
+        player_inventory = obj.generate_full_inventory()
+        enemy_inventory = obj.generate_full_inventory()
+
+        player = obj.generate_player("Bob")
+        enemy = obj.generate_grunt("ogre", "A foul smelling creature who haunts caverns.")
+
+        decision, chosen_object = enemy.get_combat_action(enemy_inventory, player)
+
+        with self.subTest():
+            self.assertEqual(
+                decision,
+                Command.BASIC_ATTACK
+            )
+
+        enemy.turn_increment()
+        enemy.turn_increment()
+        enemy.turn_increment()
+        enemy.turn_increment()
+        enemy.turn_increment()
+
+        decision, chosen_object = enemy.get_combat_action(enemy_inventory, player)
+        with self.subTest():
+            self.assertEqual(
+                decision,
+                Command.USE_ABILITY
+            )
+            print(chosen_object.name)
+
+        em.handle_enemy_ability(enemy, chosen_object, player)
+        
+        with self.subTest():
+            self.assertEqual(
+                chosen_object.turns_to_ready,
+                3
+            )

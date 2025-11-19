@@ -9,14 +9,28 @@ def deal_basic_attack_damage(character, target):
     target.take_damage(damage_dealt)
     return damage_dealt
 
+
+def player_attack(player, enemy):
+    if not check_hit(player, enemy):
+        print("You miss your attack!")
+        return None
+    
+    return deal_basic_attack_damage(player, enemy)
+
+def enemy_attack(player, enemy):
+    if not check_hit(enemy, player):
+        print(f"The {enemy.name} misses their attack!")
+        return None
+    
+    return deal_basic_attack_damage(enemy, player)
+
+
 def get_consumables_item_list(inventory):
     consumables_item_list = inventory.get_item_list("consumables")
 
     return consumables_item_list
 
 def use_consumable(user, item):
-    # TODO: Split this into separate functions. Use item vs. message generated.
-    # TODO: Switch to Enums for item types.
     if not item.is_consumable:
         raise Exception("Item is not a consumable.")
 
@@ -46,7 +60,7 @@ def use_combatant_ability(user, ability, target):
 
     match ability.effect_type:
         case EffectType.DIRECT_DMG:
-            outcome = calculate_ability_damage(amount, ability.damage_type, target)
+            outcome = scs.calculate_ability_damage(amount, ability.damage_type, target)
             target.take_damage(outcome)
         case EffectType.DMG_MULT:
             outcome = scs.calculate_basic_attack_damage(user, target, amount)

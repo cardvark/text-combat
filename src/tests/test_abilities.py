@@ -101,6 +101,53 @@ class TestAbilities(unittest.TestCase):
                 delay_ability.check_ready(),
                 False
             )
+        
+        delay_ability2 = DelayBased(
+            "another second wind",
+            "a self-heal ability",
+            turns_to_ready,
+            EffectType.HEAL_DIRECT,
+            25,
+            TargetType.SELF,
+            8
+            )
+        
+        with self.subTest():
+            self.assertEqual(
+                delay_ability2.turns_to_ready,
+                8
+            )
+        
+        delay_ability2.turn_increment()
+        delay_ability2.turn_increment()
+        delay_ability2.turn_increment()
+        delay_ability2.turn_increment()
+        delay_ability2.turn_increment()
+        delay_ability2.turn_increment()
+        delay_ability2.turn_increment()
+        delay_ability2.turn_increment()
+
+        with self.subTest():
+            self.assertEqual(
+                delay_ability2.check_ready(),
+                True
+            )
+
+        delay_ability2.use_ability()
+
+        with self.subTest():
+            self.assertEqual(
+                delay_ability2.turns_to_ready,
+                5
+            )
+
+        delay_ability2.reset()
+
+        with self.subTest():
+            self.assertEqual(
+                delay_ability2.check_ready(),
+                False
+            )
 
     def test_charge_based(self):
         print("\n\nTesting charge-based abilities.")
@@ -227,7 +274,7 @@ class TestCharacterAbilities(unittest.TestCase):
         player1.learn_ability(rage)
         player1.learn_ability(lightning_ability)
 
-        print(player1.list_abilities())
+        print(player1.list_ability_names())
         # ['rage', 'lightning bolt', 'cleave', 'second wind']
 
         player1.abilities

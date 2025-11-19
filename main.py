@@ -1,15 +1,16 @@
-from src.characters import Combatant
+from src.characters import Combatant, GruntEnemy
 from src.tools import *
 from src.combat_functions import *
 from src.combat_sim import *
 from src.inventory import Inventory
 from src.abilities import *
 from src.type_enums import *
+import copy
 import time
 
 def main():
     player1 = Combatant("Bob", "A vaguely nebbish creature.", 5, "fighter")
-    enemy_combatant = Combatant("ogre", "A foul, be-stenched beast looms three spans high.", 6, "fighter")
+    enemy_combatant = GruntEnemy("ogre", "A foul, be-stenched beast looms three spans high.", 6, "fighter")
 
     stick = Weapon("stick", "A sad, sickly little twig of a weapon.", "mace", "blunt", 3)
     long_sword = Weapon("long sword", "A steel sword of some quality.", "sword", "slashing", 10)
@@ -28,7 +29,7 @@ def main():
         player_inventory.add_item(item)
         enemy_inventory.add_item(item)
 
-    player1.equip_item(stick)
+    player1.equip_item(long_sword)
     enemy_combatant.equip_item(long_sword)
 
     second_wind = TurnBased(
@@ -36,7 +37,7 @@ def main():
         "a self-heal ability",
         5,
         EffectType.HEAL_PERCENT,
-        0.25,
+        0.35,
         TargetType.SELF,
         )
     
@@ -49,6 +50,17 @@ def main():
             TargetType.OTHER,
             ResetType.BATTLE
         )
+    
+    claw = DelayBased(
+        "claw",
+        "a rending strike with vicious claws",
+        3,
+        EffectType.DIRECT_DMG,
+        25,
+        TargetType.OTHER,
+        starting_delay=5,
+        damage_type=DamageType.SLASHING,
+    )
 
     lightning_ability = elementalMagic(
             "lightning bolt",
@@ -61,9 +73,12 @@ def main():
             ElementType.LIGHTNING,
         )
 
-    player1.learn_ability(second_wind)
+    player1.learn_ability(copy.copy(second_wind))
     player1.learn_ability(cleave)
     player1.learn_ability(lightning_ability)
+
+    enemy_combatant.assign_primary(claw)
+    enemy_combatant.assign_self_heal(second_wind)
 
     player_move = True
     while (player1.is_conscious and enemy_combatant.is_conscious):

@@ -2,6 +2,7 @@ import unittest
 import src.tests.test_characters
 import sys
 import importlib
+import os
 
 
 def main():

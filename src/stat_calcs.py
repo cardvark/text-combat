@@ -84,9 +84,9 @@ def calculate_ability_damage(base_damage, damage_type, target):
     if damage_type in target.weaknesses:
         dmg_modifier += 0.5
     
-    if dmg_type in target.resistances:
+    if damage_type in target.resistances:
         dmg_modifier += -0.5
     
-    total_damage = random.uniform(raw_total_damage / 2, raw_total_damage * 1.5) * dmg_modifier
+    total_damage = random.uniform(base_damage / 2, base_damage * 1.5) * dmg_modifier
     return int(total_damage)
     

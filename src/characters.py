@@ -1,6 +1,7 @@
 import src.stat_calcs as scs
 from src.environmentals import Environmental
 from src.abilities import EffectType, CostType, ResetType
+from src.command_enums import *
 
 class Combatant(Environmental):
     def __init__(self, name, description, level, job):
@@ -32,6 +33,12 @@ class Combatant(Environmental):
     
     def get_current_mp(self):
         return self.current_mp
+
+    def get_current_hp_perc(self):
+        return self.current_hp / self.max_hp
+
+    def get_current_mp_perc(self):
+        return self.current_mp / self.max_mp
 
     def get_job(self):
         return self.job
@@ -98,6 +105,9 @@ class Combatant(Environmental):
         
 
     def learn_ability(self, ability):
+        if ability in self.abilities:
+            return
+
         ability.user = self
         self.abilities.append(ability)
         self.abilities = sorted(
@@ -128,3 +138,49 @@ class Combatant(Environmental):
         return f"\n----------\nCombatant: {self.get_name()}\nDescription: {self.get_description()}\n\nJob: {self.get_job().capitalize()}\n\nHP: {self.get_current_hp()} / {self.get_max_hp()}\nMP: {self.get_current_mp()} / {self.get_max_mp()}\n----------\n"
         
 
+class NPCCombatant(Combatant):
+    def __init__(self, 
+        name, 
+        description, 
+        level, 
+        job,
+        ):
+        super().__init__(name, description, level, job)
+        self.primary_special_ability = None
+        self.secondary_special_ability = None
+        self.self_heal = None
+
+    def assign_primary(self, ability):
+        self.learn_ability(ability)
+        self.primary_special_ability = ability
+
+    def assign_secondary(self, ability):
+        self.learn_ability(ability)
+        self.secondary_special_ability = ability
+    
+    def assign_self_heal(self, ability):
+        self.learn_ability(ability)
+        self.self_heal = ability
+    
+    def get_combat_action(self, inventory, enemy):
+        pass
+
+
+class GruntEnemy(NPCCombatant):
+    def __init__(self, 
+        name, 
+        description, 
+        level, 
+        job,
+        ):
+        super().__init__(name, description, level, job)
+    
+    def get_combat_action(self, inventory, enemy):
+        if self.get_current_hp_perc() <= 0.5 and self.self_heal.check_ready():
+            return Command.USE_ABILITY, self.self_heal
+        if self.primary_special_ability.check_ready():
+            return Command.USE_ABILITY, self.primary_special_ability
+        # if self.secondary_special_ability.check_ready():
+        #     return Command.USE_ABILITY, self.secondary_special_ability
+        
+        return Command.BASIC_ATTACK, None
