@@ -25,6 +25,7 @@ def enemy_turn(enemy_inventory, player, enemy):
     if decision == Command.USE_CONSUMABLE:
         em.handle_enemy_item(enemy, enemy_inventory, chosen_object, player)
 
+
 def generate_player_options(player, inventory):
     i = 1
 
