@@ -109,7 +109,7 @@ class TestAbilities(unittest.TestCase):
             EffectType.HEAL_DIRECT,
             25,
             TargetType.SELF,
-            8
+            starting_delay=8
             )
         
         with self.subTest():
@@ -211,7 +211,6 @@ class TestAbilities(unittest.TestCase):
             lightning_ability.current_mp_cost,
             int(1.25 * 20)
         )
-
 
 
 

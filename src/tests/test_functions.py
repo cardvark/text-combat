@@ -138,12 +138,12 @@ class TestCharacters(unittest.TestCase):
     
     def test_04_abilities(self):
         player1 = self.generate_player("Bob")
-        player1 = self.generate_player("Mark")
+        player2 = self.generate_player("Mark")
 
-        print(player1.list_abilities())
+        print(player1.list_ability_names())
         # ['rage', 'lightning bolt', 'cleave', 'second wind']
 
         p1_second_wind = player1.abilities[3]
 
-        outcome = use_combatant_ability(player1, p1_second_wind)
+        outcome = use_combatant_ability(player1, p1_second_wind, player1)
         print(outcome)

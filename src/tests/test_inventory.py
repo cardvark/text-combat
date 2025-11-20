@@ -82,7 +82,7 @@ class TestInventory(unittest.TestCase):
 
         inventory = self.generate_full_inventory()
         consumables = inventory.get_consumables()
-        consumables_item_list = inventory.get_item_list(flag="consumable")
+        consumables_item_list = inventory.get_item_list(flag="consumables")
 
         with self.subTest():
             self.assertEqual(
