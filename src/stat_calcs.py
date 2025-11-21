@@ -8,6 +8,8 @@ MISS_CHANCE = 0.125
 BASE_DAMAGE_MODIFIER = 1
 BASE_CHAR_DAMAGE = 5
 
+# TODO: Update jobs to enum.
+
 jobs_list = [
     "fighter",
     "mage",

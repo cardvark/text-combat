@@ -1,12 +1,20 @@
 from __future__ import annotations
 import src.stat_calcs as scs
-from src.environmentals import Environmental
 from src.abilities import EffectType, CostType, ResetType
 from src.command_enums import *
+import src.tools as tl
 import src.locations as loc
+import src.abilities as ab
+import src.inventory as inv
+import src.environmentals as env
 
-class Combatant(Environmental):
-    def __init__(self, name, description, level, job):
+class Combatant(env.Environmental):
+    def __init__(self, 
+                 name: str, 
+                 description: str, 
+                 level: int, 
+                 job: str, # TODO job enum
+                 ):
         super().__init__(name, description)
         self.level = level
         self.job = job
@@ -31,22 +39,23 @@ class Combatant(Environmental):
     def get_max_mp(self) -> int:
         return self.max_mp
 
-    def get_current_hp(self):
+    def get_current_hp(self) -> int:
         return self.current_hp
     
-    def get_current_mp(self):
+    def get_current_mp(self) -> int:
         return self.current_mp
 
-    def get_current_hp_perc(self):
+    def get_current_hp_perc(self) -> float:
         return self.current_hp / self.max_hp
 
-    def get_current_mp_perc(self):
+    def get_current_mp_perc(self) -> float:
         return self.current_mp / self.max_mp
 
-    def get_job(self):
+    def get_job(self) -> str:
+        # TODO job enum
         return self.job
 
-    def equip_item(self, equipment):
+    def equip_item(self, equipment: tl.Equipment) -> tl.Equipment:
         old_equipment = None
 
         if not equipment.is_equippable:
@@ -65,49 +74,49 @@ class Combatant(Environmental):
     
         return old_equipment
     
-    def remove_main(self):
+    def remove_main(self) -> tl.Equipment:
         equipment = self.main_equip
         self.main_equip = None        
         return equipment
 
-    def remove_off(self):
+    def remove_off(self) -> tl.Equipment:
         equipment = self.off_equip
         self.off_equip = None        
         return equipment
 
-    def remove_chest(self):
+    def remove_chest(self) -> tl.Equipment:
         equipment = self.chest_equip
         self.chest_equip = None        
         return equipment
 
-    def restore_hp(self, amount):
+    def restore_hp(self, amount: int) -> None:
         restored_hp = min(self.current_hp + amount, self.max_hp)
         self.current_hp = restored_hp
 
-    def restore_mp(self, amount):
+    def restore_mp(self, amount: int) -> None:
         restored_mp = min(self.current_mp + amount, self.max_mp)
         self.current_mp = restored_mp
 
-    def take_damage(self, amount):
+    def take_damage(self, amount: int) -> None:
         self.current_hp -= amount
         if self.current_hp <= 0:
             self.fall_unconscious()
         
-    def use_mp(self, amount):
+    def use_mp(self, amount: int) -> None:
         if amount >= self.current_mp:
             raise Exception("Cannot spend more mp than one has.")
         
         self.current_mp -= amount
 
-    def fall_unconscious(self):
+    def fall_unconscious(self) -> None:
         self.is_conscious = False
 
-    def turn_increment(self, count=1):
+    def turn_increment(self, count: int = 1) -> None:
         for ability in self.abilities:
             ability.turn_increment(count)
         
 
-    def learn_ability(self, ability):
+    def learn_ability(self, ability: ab.Ability) -> None:
         if ability in self.abilities:
             return
 
@@ -118,20 +127,20 @@ class Combatant(Environmental):
             key=lambda a: (a.effect_type.name, a.name)
         )
 
-    def list_ability_names(self):
+    def list_ability_names(self) -> list[str]:
         abilities_list = []
         for ability in self.abilities:
             abilities_list.append(ability.name)
         return abilities_list
 
-    def get_abilities(self):
+    def get_abilities(self) -> list[ab.Ability]:
         return self.abilities
     
-    def reset_abilities(self):
+    def reset_abilities(self) -> None:
         for ability in self.abilities:
             ability.reset()
 
-    def reset_battle_abilities(self):
+    def reset_battle_abilities(self) -> None:
         for ability in self.abilities:
             if ability.reset_type == ResetType.BATTLE:
                 ability.reset()
@@ -139,48 +148,51 @@ class Combatant(Environmental):
     def update_current_location(self, location: loc.Location) -> None:
         self.current_location = location
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"\n----------\nCombatant: {self.get_name()}\nDescription: {self.get_description()}\n\nJob: {self.get_job().capitalize()}\n\nHP: {self.get_current_hp()} / {self.get_max_hp()}\nMP: {self.get_current_mp()} / {self.get_max_mp()}\n----------\n"
         
 
 class NPCCombatant(Combatant):
     def __init__(self, 
-        name, 
-        description, 
-        level, 
-        job,
+        name: str, 
+        description: str, 
+        level: int, 
+        job: str, # TODO job enum
         ):
         super().__init__(name, description, level, job)
         self.primary_special_ability = None
         self.secondary_special_ability = None
         self.self_heal = None
 
-    def assign_primary(self, ability):
+    def assign_primary(self, ability) -> None:
         self.learn_ability(ability)
         self.primary_special_ability = ability
 
-    def assign_secondary(self, ability):
+    def assign_secondary(self, ability) -> None:
         self.learn_ability(ability)
         self.secondary_special_ability = ability
     
-    def assign_self_heal(self, ability):
+    def assign_self_heal(self, ability) -> None:
         self.learn_ability(ability)
         self.self_heal = ability
     
-    def get_combat_action(self, inventory, enemy):
+    def get_combat_action(self, inventory: inv.Inventory, enemy: Combatant) -> None:
         pass
 
 
 class GruntEnemy(NPCCombatant):
     def __init__(self, 
-        name, 
-        description, 
-        level, 
-        job,
+        name: str, 
+        description: str, 
+        level: int, 
+        job: str, # TODO job enum
         ):
         super().__init__(name, description, level, job)
     
-    def get_combat_action(self, inventory, enemy):
+    def get_combat_action(self, 
+                          inventory: inv.Inventory, 
+                          enemy: Combatant,
+                          ) -> tuple[Command, ab.Ability | tl.Consumable]:
         if self.get_current_hp_perc() <= 0.5 and self.self_heal.check_ready():
             return Command.USE_ABILITY, self.self_heal
         if self.primary_special_ability.check_ready():

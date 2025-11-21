@@ -16,10 +16,15 @@ class Weapon(Equipment):
         self.base_damage = base_damage
 
 
-class Potion(Environmental):
+class Consumable(Environmental):
+    def __init__(self, name, description):
+        super().__init__(name, description)
+        self.is_consumable = True
+
+
+class Potion(Consumable):
     def __init__(self, name, description, potion_type, amount):
         super().__init__(name, description)
         self.is_potion = True
         self.consumable_type = potion_type
         self.amount = amount
-        self.is_consumable = True
