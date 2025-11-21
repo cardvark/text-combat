@@ -10,7 +10,7 @@ class Ability:
         effect_amount: int, 
         effect_target: TargetType,
         damage_type: DamageType = None
-        ):
+        ) -> None:
         self.name = name
         self.description = description
         self.cost_type = cost_type
@@ -44,7 +44,7 @@ class MPBased(Ability):
         effect_target: TargetType,
         cost_modifier: float,
         damage_type: DamageType | None = None,
-        ):
+        ) -> None:
         super().__init__(name, description, CostType.MP, effect_type, effect_amount, effect_target, damage_type)
         self.base_mp_cost = int(mp_cost)
         self.current_mp_cost = self.base_mp_cost
@@ -69,7 +69,7 @@ class elementalMagic(MPBased):
         effect_target: TargetType,
         cost_modifier: float,
         element: ElementType,
-        ):
+        ) -> None:
         super().__init__(
             name, 
             description, 
@@ -91,7 +91,7 @@ class TurnBased(Ability):
         effect_amount: int, 
         effect_target: TargetType,
         damage_type: DamageType | None = None,
-        ):
+        ) -> None:
         super().__init__(name, description, CostType.TURN, effect_type, effect_amount, effect_target,damage_type)
         self.max_turns = max_turns
         self.turns_to_ready = 0
@@ -125,7 +125,7 @@ class DelayBased(TurnBased):
         effect_target: TargetType,
         damage_type: DamageType | None = None,
         starting_delay: int | None = None,
-        ):
+        ) -> None:
         super().__init__(name, description, max_turns, effect_type, effect_amount, effect_target, damage_type)
         self.starting_delay = starting_delay if starting_delay else self.max_turns
         self.turns_to_ready = self.starting_delay
@@ -144,7 +144,7 @@ class ChargeBased(Ability):
         effect_target: TargetType,
         reset_type: ResetType,
         damage_type: DamageType | None = None,
-        ):
+        ) -> None:
         super().__init__(name, description, CostType.CHARGE, effect_type, effect_amount, effect_target, damage_type)
 
         self.total_charges = charges

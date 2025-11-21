@@ -14,7 +14,7 @@ class Combatant(env.Environmental):
                  description: str, 
                  level: int, 
                  job: str, # TODO job enum
-                 ):
+                 ) -> None:
         super().__init__(name, description)
         self.level = level
         self.job = job
@@ -158,7 +158,7 @@ class NPCCombatant(Combatant):
         description: str, 
         level: int, 
         job: str, # TODO job enum
-        ):
+        ) -> None:
         super().__init__(name, description, level, job)
         self.primary_special_ability = None
         self.secondary_special_ability = None
@@ -182,11 +182,11 @@ class NPCCombatant(Combatant):
 
 class GruntEnemy(NPCCombatant):
     def __init__(self, 
-        name: str, 
-        description: str, 
-        level: int, 
-        job: str, # TODO job enum
-        ):
+                 name: str, 
+                 description: str, 
+                 level: int, 
+                 job: str, # TODO job enum
+                 ) -> None:
         super().__init__(name, description, level, job)
     
     def get_combat_action(self, 
