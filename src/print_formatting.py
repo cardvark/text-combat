@@ -264,3 +264,12 @@ def damage_flavor(original_hp_perc, new_hp_perc):
 
     if flavor:
         print(flavor)
+
+def name_stripper(text: str) -> str:
+    output = text[0].lower() + text[1:]
+
+    output = output.removeprefix("a ")
+    output = output.removeprefix("an ")
+    output = output.removeprefix("the ")
+    
+    return output

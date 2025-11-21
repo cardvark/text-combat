@@ -1,4 +1,8 @@
+from __future__ import annotations
 from enum import Enum
+import src.characters as char
+import src.print_formatting as pf
+import src.environmentals as env
 
 class Direction(Enum):
     NORTH = "north"
@@ -30,11 +34,12 @@ class Location():
         self.short_description = short_description
         self.intro_description = intro_description
         self.long_description = long_description
-        self.environmentals = []
+        self.items = []
         self.NPCs = []
-        self.players = None
+        self.player = None
         self.connections = {}
         self.has_entered = False
+        self.stripped_name = pf.name_stripper(self.name)
 
     def connect_locations(self, second_location, direction, one_way=False):
         if not isinstance(direction, Direction):
@@ -66,3 +71,85 @@ class Location():
 
         return formatted_directions
     
+    def add_NPC(self, character):
+        if not isinstance(character, char.NPCCombatant):
+            raise Exception("Not an NPC Combatant character.")
+
+        self.NPCs.append(character)
+
+        self.NPCs = sorted(self.NPCs)
+    
+    def get_formatted_NPCs(self) -> str:
+        formatted_NPCs = ""
+
+        for npc in self.NPCs:
+            formatted_NPCs += npc.description + "\n"
+
+        return formatted_NPCs
+    
+    def get_formatted_items(self) -> str:
+        formatted_items = ""
+
+        for item in self.items:
+            formatted_items += item.name.capitalize() + "\n"
+
+        return formatted_items
+    
+    def get_formatted_entrance(self) -> str:
+        formatted_entrance_text = ""
+
+        formatted_entrance_text += self.name + "\n"
+        
+        if not self.has_entered: 
+            formatted_entrance_text += self.intro_description
+        else:
+            formatted_entrance_text += self.long_description
+
+        formatted_entrance_text += "\n"
+        
+        if self.NPCs:
+            formatted_entrance_text += f"Within the {self.stripped_name}, you see:\n"
+
+            formatted_entrance_text += self.get_formatted_NPCs()
+        
+        return formatted_entrance_text
+    
+    def get_look(self) -> str:
+        item_location = "floor" # TODO reconsider how to make this more dynamic.
+
+        output = f"You take a hard look around.\n"
+
+        if self.NPCs:
+            output += "\n"
+            output += f"Within the {self.stripped_name}, you see:\n"
+
+            output += self.get_formatted_NPCs()
+
+
+        if self.items:
+            output += "\n"
+            output += f"On the {item_location}, you see:\n"
+            output += self.get_formatted_items()
+
+        output += "\n"
+        output += "Exits:\n"
+        output += self.get_formatted_connections()
+    
+        return output
+    
+    def add_item(self, item: env.Environmental) -> None:
+        if not isinstance(item, env.Environmental):
+            raise Exception("Not an environmental item.")
+        
+        self.items.append(item)
+
+    def player_enter(self, player: char.Combatant) -> str:
+        self.player = player
+        player.update_current_location(self)
+        entrance_text = self.get_formatted_entrance()
+        self.has_entered = True
+
+        return entrance_text
+
+    def player_leave(self) -> None:
+        self.player = None

@@ -1,7 +1,9 @@
+from __future__ import annotations
 import src.stat_calcs as scs
 from src.environmentals import Environmental
 from src.abilities import EffectType, CostType, ResetType
 from src.command_enums import *
+import src.locations as loc
 
 class Combatant(Environmental):
     def __init__(self, name, description, level, job):
@@ -21,6 +23,7 @@ class Combatant(Environmental):
         self.abilities = []
         self.buffs = []
         self.debuffs = []
+        self.current_location = None
 
     def get_max_hp(self):
         return self.max_hp
@@ -133,6 +136,8 @@ class Combatant(Environmental):
             if ability.reset_type == ResetType.BATTLE:
                 ability.reset()
 
+    def update_current_location(self, location: loc.Location) -> None:
+        self.current_location = location
 
     def __repr__(self):
         return f"\n----------\nCombatant: {self.get_name()}\nDescription: {self.get_description()}\n\nJob: {self.get_job().capitalize()}\n\nHP: {self.get_current_hp()} / {self.get_max_hp()}\nMP: {self.get_current_mp()} / {self.get_max_mp()}\n----------\n"
