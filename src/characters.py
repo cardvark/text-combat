@@ -25,10 +25,10 @@ class Combatant(Environmental):
         self.debuffs = []
         self.current_location = None
 
-    def get_max_hp(self):
+    def get_max_hp(self) -> int:
         return self.max_hp
 
-    def get_max_mp(self):
+    def get_max_mp(self) -> int:
         return self.max_mp
 
     def get_current_hp(self):

@@ -98,4 +98,7 @@ class TestLocations(unittest.TestCase):
 
         print(cave_chamber.get_look())
 
-        
+        print("\n\n")
+        entrance_text = cave_chamber.player_enter(player)
+        print(entrance_text)
+        print("\n\n")

@@ -28,6 +28,7 @@ class Location():
         short_description,
         intro_description,
         long_description,
+        item_location="floor"
     ):
         self.loc_id = loc_id
         self.name = name
@@ -40,8 +41,9 @@ class Location():
         self.connections = {}
         self.has_entered = False
         self.stripped_name = pf.name_stripper(self.name)
+        self.item_location = item_location
 
-    def connect_locations(self, second_location, direction, one_way=False):
+    def connect_locations(self, second_location: Location, direction: Direction, one_way=False) -> None:
         if not isinstance(direction, Direction):
             raise Exception("Not a valid direction")
         
@@ -62,7 +64,7 @@ class Location():
         if not one_way:
             second_location.connect_locations(self, opposite)
 
-    def get_formatted_connections(self):
+    def get_formatted_connections(self) -> str:
         formatted_directions = ""
         for direction in Direction:
             if direction in self.connections:
@@ -71,7 +73,7 @@ class Location():
 
         return formatted_directions
     
-    def add_NPC(self, character):
+    def add_NPC(self, character: char.NPCCombatant) -> None:
         if not isinstance(character, char.NPCCombatant):
             raise Exception("Not an NPC Combatant character.")
 
@@ -83,7 +85,7 @@ class Location():
         formatted_NPCs = ""
 
         for npc in self.NPCs:
-            formatted_NPCs += npc.description + "\n"
+            formatted_NPCs += f"{npc.description} ({npc.name})\n"
 
         return formatted_NPCs
     
@@ -91,7 +93,7 @@ class Location():
         formatted_items = ""
 
         for item in self.items:
-            formatted_items += item.name.capitalize() + "\n"
+            formatted_items += f"{item.description.capitalize()} ({item.name})\n"
 
         return formatted_items
     
@@ -115,20 +117,17 @@ class Location():
         return formatted_entrance_text
     
     def get_look(self) -> str:
-        item_location = "floor" # TODO reconsider how to make this more dynamic.
-
         output = f"You take a hard look around.\n"
 
         if self.NPCs:
             output += "\n"
-            output += f"Within the {self.stripped_name}, you see:\n"
+            output += f"You see:\n"
 
             output += self.get_formatted_NPCs()
 
-
         if self.items:
             output += "\n"
-            output += f"On the {item_location}, you see:\n"
+            output += f"On the {self.item_location}:\n"
             output += self.get_formatted_items()
 
         output += "\n"
