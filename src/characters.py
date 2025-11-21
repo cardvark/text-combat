@@ -2,9 +2,9 @@ from __future__ import annotations
 import src.stat_calcs as scs
 from src.abilities import EffectType, CostType, ResetType
 from src.command_enums import *
-import src.tools as tl
+import src.tools as tls
 import src.locations as loc
-import src.abilities as ab
+import src.abilities as abs
 import src.inventory as inv
 import src.environmentals as env
 
@@ -55,7 +55,7 @@ class Combatant(env.Environmental):
         # TODO job enum
         return self.job
 
-    def equip_item(self, equipment: tl.Equipment) -> tl.Equipment:
+    def equip_item(self, equipment: tls.Equipment) -> tls.Equipment:
         old_equipment = None
 
         if not equipment.is_equippable:
@@ -74,17 +74,17 @@ class Combatant(env.Environmental):
     
         return old_equipment
     
-    def remove_main(self) -> tl.Equipment:
+    def remove_main(self) -> tls.Equipment:
         equipment = self.main_equip
         self.main_equip = None        
         return equipment
 
-    def remove_off(self) -> tl.Equipment:
+    def remove_off(self) -> tls.Equipment:
         equipment = self.off_equip
         self.off_equip = None        
         return equipment
 
-    def remove_chest(self) -> tl.Equipment:
+    def remove_chest(self) -> tls.Equipment:
         equipment = self.chest_equip
         self.chest_equip = None        
         return equipment
@@ -116,7 +116,7 @@ class Combatant(env.Environmental):
             ability.turn_increment(count)
         
 
-    def learn_ability(self, ability: ab.Ability) -> None:
+    def learn_ability(self, ability: abs.Ability) -> None:
         if ability in self.abilities:
             return
 
@@ -133,7 +133,7 @@ class Combatant(env.Environmental):
             abilities_list.append(ability.name)
         return abilities_list
 
-    def get_abilities(self) -> list[ab.Ability]:
+    def get_abilities(self) -> list[abs.Ability]:
         return self.abilities
     
     def reset_abilities(self) -> None:
@@ -192,7 +192,7 @@ class GruntEnemy(NPCCombatant):
     def get_combat_action(self, 
                           inventory: inv.Inventory, 
                           enemy: Combatant,
-                          ) -> tuple[Command, ab.Ability | tl.Consumable]:
+                          ) -> tuple[Command, abs.Ability | tls.Consumable]:
         if self.get_current_hp_perc() <= 0.5 and self.self_heal.check_ready():
             return Command.USE_ABILITY, self.self_heal
         if self.primary_special_ability.check_ready():
