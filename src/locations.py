@@ -23,13 +23,13 @@ opposite_dirs = {
 
 class Location():
     def __init__(self, 
-        loc_id,
-        name,
-        short_description,
-        intro_description,
-        long_description,
-        item_location="floor"
-    ):
+        loc_id: str,
+        name: str,
+        short_description: str,
+        intro_description: str,
+        long_description: str,
+        item_location: str = "floor",
+    ) -> None:
         self.loc_id = loc_id
         self.name = name
         self.short_description = short_description
@@ -43,7 +43,12 @@ class Location():
         self.stripped_name = pf.name_stripper(self.name)
         self.item_location = item_location
 
-    def connect_locations(self, second_location: Location, direction: Direction, one_way=False) -> None:
+    def connect_locations(
+            self, 
+            second_location: Location, 
+            direction: Direction, 
+            one_way: bool = False
+            ) -> None:
         if not isinstance(direction, Direction):
             raise Exception("Not a valid direction")
         

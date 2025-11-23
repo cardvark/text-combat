@@ -2,8 +2,13 @@ from prettytable import PrettyTable, TableStyle
 from src.type_enums import *
 import src.tools as tls
 import random
+import src.characters as char
+import src.abilities as abs
 
-def print_status(player, enemy):
+def print_status(
+        player: char.Combatant, 
+        enemy: char.NPCCombatant
+        ) -> None:
     # TODO: make enemy status part of the enemy's object that can be called as needed.
     enemy_status_dict = {
         0.9: "pristine and malevolent",
@@ -28,7 +33,10 @@ def print_status(player, enemy):
     print(f"Your opponent appears {enemy_status}.")
     print()
 
-def format_options_from_dict(options_dict, enums=False):
+def format_options_from_dict(
+        options_dict: dict[str, str | Enum], 
+        enums: bool = False,
+        ) -> str:
     output = ""
 
     for k, v in sorted(options_dict.items()):
@@ -40,7 +48,11 @@ def format_options_from_dict(options_dict, enums=False):
     return output
 
 
-def generate_selection_dict(object_list, go_back=False):
+def generate_selection_dict(
+        object_list: list[abs.Ability], 
+        go_back: bool = False
+        ) -> dict[str, abs.Ability]: 
+    #currently only used to generate abilities selection dict.
     selection_dict = {}
     i = 1
     
@@ -88,7 +100,9 @@ def generate_aggregated_items(
     return count_dict_with_ids
 
 
-def get_inventory_table(selection_dict):
+def get_inventory_table(
+        selection_dict: dict[str, list[str, int]],
+        ) -> PrettyTable:
     table = PrettyTable()
     table.field_names = ["#", "Name", "Count"]
 
@@ -104,7 +118,9 @@ def get_inventory_table(selection_dict):
     return table
 
 
-def get_abilities_table(abilities_list):
+def get_abilities_table(
+        abilities_list: list[abs.Ability],
+        ) -> PrettyTable:
     i = 1
 
     table = PrettyTable()
@@ -129,7 +145,7 @@ def get_abilities_table(abilities_list):
     return table
 
 
-def get_return_to_previous_table(table):
+def get_return_to_previous_table(table: PrettyTable) -> PrettyTable:
     table_string = table.get_string()
     table_lines = table_string.split("\n")
     table_width = len(table_lines[0])
@@ -155,11 +171,7 @@ def get_return_to_previous_table(table):
     return return_table
 
 
-def get_return_to_previous_option(index):
-    return f"[{index}] Return to previous menu.\n"
-
-
-def get_table_bottom_border(table):
+def get_table_bottom_border(table: PrettyTable) -> str:
     table_string = table.get_string()
     table_lines = table_string.split("\n")
     table_width = len(table_lines[0])
@@ -167,8 +179,7 @@ def get_table_bottom_border(table):
     return "-" * table_width
     
 
-
-def get_ability_status(ability):
+def get_ability_status(ability: abs.Ability) -> str:
     ability_status = ""
 
     match ability.cost_type:
@@ -189,7 +200,11 @@ def get_ability_status(ability):
 
     return ability_status
 
-def format_ability_outcome_text(ability, outcome, target):
+def format_ability_outcome_text(
+        ability: abs.Ability, 
+        outcome: int, 
+        target: char.Combatant,
+        ) -> str:
     output = ""
     output += f"You used {ability.name}!\n"
     target_name = "yourself" if ability.effect_target == TargetType.SELF else target.name
@@ -209,7 +224,11 @@ def format_ability_outcome_text(ability, outcome, target):
 
     return output
 
-def format_enemy_ability_outcome_text(ability, outcome, enemy):
+def format_enemy_ability_outcome_text(
+        ability: abs.Ability, 
+        outcome: int, 
+        enemy: char.NPCCombatant
+        ) -> str:
     output = ""
     enemy_name = format_target_name(enemy.name, True)
     output += f"{enemy_name} used {ability.name}!\n"
@@ -234,7 +253,10 @@ def format_enemy_ability_outcome_text(ability, outcome, enemy):
     return output
 
 
-def format_target_name(target_name, capitalize=False):
+def format_target_name(
+        target_name: str, 
+        capitalize: bool = False,
+        ) -> str:
     output = target_name
 
     if not target_name[0].isupper():
@@ -245,7 +267,11 @@ def format_target_name(target_name, capitalize=False):
 
     return output
 
-def get_consumable_message(user, item, amount):
+def get_consumable_message(
+        user: char.Combatant, 
+        item: tls.Consumable, 
+        amount: int
+        ) -> str:
     if not item.is_consumable:
         raise Exception("Item is not a consumable.")
 
@@ -262,7 +288,11 @@ def get_consumable_message(user, item, amount):
     return message
 
 
-def damage_flavor(original_hp_perc, new_hp_perc):
+def damage_flavor(
+        original_hp_perc: float, 
+        new_hp_perc: float,
+        ) -> str:
+    # TODO consider returning string to print. 
     damage_delta = original_hp_perc - new_hp_perc
 
     flavor = ""
@@ -279,8 +309,7 @@ def damage_flavor(original_hp_perc, new_hp_perc):
     elif original_hp_perc > 0.5 and new_hp_perc <= 0.5:
         flavor += "Your body flags under the onslaught, but you grip your weapon tighter, and face your opponent squarely, ready for more."
 
-    if flavor:
-        print(flavor)
+    return flavor
 
 def name_stripper(text: str) -> str:
     output = text[0].lower() + text[1:]

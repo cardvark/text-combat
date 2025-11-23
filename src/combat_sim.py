@@ -91,32 +91,6 @@ def player_turn(
             break
         else:
             print("Select one of the options.\n")
-
-
-def damage_flavor(
-        original_hp_perc: float, 
-        new_hp_perc: float,
-        ) -> None:
-    # TODO consider moving to print_formatting, and return a string.
-    # for consistency's sake.
-    damage_delta = original_hp_perc - new_hp_perc
-
-    flavor = ""
-
-    if damage_delta > 0.25:
-        options = [
-            "You gasp with the shock of pain, clutching at the fresh wound in your side with a feeling of disbelief. ",
-            "Your head rings from the blow, and your enemy appears doubled in your vision for a long, lingering moment. ",
-        ]
-        flavor += random.choice(options)
-
-    if original_hp_perc > 0.2 and new_hp_perc <= 0.2:
-        flavor += "The world dims at the edges, and takes on a grainy aspect. The sharp pains have dulled, and some dim part of you recognizes that you are in deep trouble."
-    elif original_hp_perc > 0.5 and new_hp_perc <= 0.5:
-        flavor += "Your body flags under the onslaught, but you grip your weapon tighter, and face your opponent squarely, ready for more."
-
-    if flavor:
-        print(flavor)
     
 
 def player_turn_selection(
