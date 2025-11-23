@@ -9,6 +9,10 @@ class Holdable(Environmental):
         super().__init__(name, description)
         self.inventory = None
         self.is_holdable = True # items that can be placed in an inventory.
+        self.is_consumable = False
+        self.is_equippable = False
+        self.equip_type = None
+        self.amount = None
     
     def add_to_inventory(self, inventory: inv.Inventory) -> None:
         self.inventory = inventory
