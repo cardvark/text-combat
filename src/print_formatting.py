@@ -62,7 +62,7 @@ def generate_aggregated_selection_dict(
     selection_dict = {}
     i = 1
 
-    for name, values in sorted(count_dict):
+    for name, values in sorted(count_dict.items()):
         idx = str(i)
         count = values[0]
         items = values[1]

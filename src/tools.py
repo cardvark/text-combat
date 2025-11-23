@@ -18,6 +18,7 @@ class Holdable(Environmental):
         self.inventory = inventory
     
     def remove_from_inventory(self) -> None:
+        self.inventory.remove_item(self)
         self.inventory = None
 
 
@@ -42,7 +43,6 @@ class Consumable(Holdable):
         self.is_consumable = True
 
     def use(self) -> int:
-        self.inventory.remove_item(self)
         self.remove_from_inventory()
         return self.amount
 

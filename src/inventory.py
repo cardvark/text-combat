@@ -34,12 +34,13 @@ class Inventory:
         if len(self.bag) >= self.inventory_cap:
             return False
         
+        item.add_to_inventory(self)
         self.bag.append(item)
         
         return True #possibly unnecessary.
     
 
-    def remove_item(self, item: tls.Environmental) -> None:
+    def remove_item(self, item: tls.Holdable) -> None:
         if item not in self.bag:
             raise Exception("Selected item not in inventory.")
         

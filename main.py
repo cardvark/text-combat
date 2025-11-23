@@ -26,8 +26,8 @@ def main():
     ]
 
     for item in items_list:
-        player_inventory.add_item(item)
-        enemy_inventory.add_item(item)
+        player_inventory.add_item(copy.copy(item))
+        enemy_inventory.add_item(copy.copy(item))
 
     player1.equip_item(long_sword)
     enemy_combatant.equip_item(long_sword)

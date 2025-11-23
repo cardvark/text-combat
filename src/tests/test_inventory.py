@@ -3,6 +3,7 @@ from src.characters import Combatant
 from src.tools import *
 from src.combat_functions import *
 from src.inventory import Inventory
+import src.tests.object_setup as obj
 
 class TestInventory(unittest.TestCase):
 
@@ -50,3 +51,36 @@ class TestInventory(unittest.TestCase):
                 4,
                 len(consumables)
             )
+
+    def test_items_in_inventory(self):
+        inventory = obj.generate_full_inventory()
+        consumables = inventory.get_consumables()
+
+        potion = consumables[0]
+        with self.subTest():
+            # checking inventory association to holdable item.
+
+            self.assertEqual(
+                inventory,
+                potion.inventory
+            )
+
+        with self.subTest():
+            # using an item should
+            # 1. remove item from inventory
+            # 2. disassociate inventory from item.
+            potion.use()
+            
+            self.assertEqual(
+                len(inventory.get_contents()),
+                4
+            )
+
+            self.assertEqual(
+                potion.inventory,
+                None
+            )
+
+        
+
+    
