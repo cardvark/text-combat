@@ -44,13 +44,6 @@ def enemy_attack(
     return deal_basic_attack_damage(enemy, player)
 
 
-def get_consumables_item_list(
-        inventory: inv.Inventory
-        ) -> list[tuple[uuid.UUID, str, str]]:
-    consumables_item_list = inventory.get_item_list("consumables")
-
-    return consumables_item_list
-
 # TODO update to also check and remove item from inventory
 # maybe.
 def use_consumable(

@@ -1,35 +1,18 @@
 from __future__ import annotations
 import src.tools as tls
+import uuid
 
 class Inventory:
-    def __init__(self, inventory_cap):
+    def __init__(self, inventory_cap: int) -> None:
         self.bag = []
         self.inventory_cap = inventory_cap
 
-    def get_contents(self):
+
+    def get_contents(self) -> list[tls.Holdable]:
         return self.bag
 
-    def get_item_list(self, flag=None):
-        tups_list = []
-        
-        match flag:
-            case "consumables":
-                bag = self.get_consumables()
-            case _:
-                bag = self.bag
 
-        for item in bag:
-            uid = item.uid
-            name = item.name
-            description = item.description
-
-            item_tup = (uid, name, description)
-
-            tups_list.append(item_tup)
-        
-        return tups_list
-    
-    def get_consumables(self):
+    def get_consumables(self) -> list[tls.Consumable]:
         consumables = []
         for item in self.bag:
             if item.is_consumable:
@@ -37,28 +20,26 @@ class Inventory:
         
         return consumables
 
-    def raise_inventory_cap(self, new_cap):
+
+    def raise_inventory_cap(self, new_cap: int) -> bool:
+        if new_cap < self.inventory_cap:
+            raise Exception("New capacity should be greater than existing capacity.")
+
         self.inventory_cap = new_cap
+
         return True
 
-    def add_item(self, item):
+
+    def add_item(self, item: tls.Holdable) -> bool:
         if len(self.bag) >= self.inventory_cap:
             return False
         
         self.bag.append(item)
         
-        return True
-
-    def get_item_by_id(self, item_id):
-        for item in self.bag:
-            if item.uid == item_id:
-                found_item = item
-                self.bag.remove(item)
-                return found_item
-        
-        return False
+        return True #possibly unnecessary.
     
-    def remove_item(self, item: tls.Environmental):
+
+    def remove_item(self, item: tls.Environmental) -> None:
         if item not in self.bag:
             raise Exception("Selected item not in inventory.")
         
