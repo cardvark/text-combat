@@ -1,20 +1,29 @@
-from src.characters import Combatant
+from __future__ import annotations
+import src.characters as char
 import src.combat_functions as cf
 from enum import Enum
 import src.print_formatting as pf
 import random
 from src.command_enums import *
 import src.enemy_manager as em
+import src.inventory as inv
+import src.abilities as abs
+import src.tools as tls
+import uuid
 
 
-class PlayerOptions(Enum):
+class PlayerOption(Enum):
     ATTACK = "Attack"
     ABILITIES = "Abilities"
     ITEMS = "Items"
     FLEE = "Flee"
 
 
-def enemy_turn(enemy_inventory, player, enemy):
+def enemy_turn(
+        enemy_inventory: inv.Inventory, 
+        player: char.Combatant, 
+        enemy: char.NPCCombatant,
+        ) -> None:
     enemy.turn_increment()
     decision, chosen_object = enemy.get_combat_action(enemy_inventory, player)
 
@@ -26,33 +35,37 @@ def enemy_turn(enemy_inventory, player, enemy):
         em.handle_enemy_item(enemy, enemy_inventory, chosen_object, player)
 
 
-def generate_player_options(player, inventory):
+def generate_player_options(
+        player: char.Combatant, 
+        inventory: inv.Inventory,
+        ) -> dict[str, PlayerOption]:
+    
     i = 1
 
     options = {
-        str(i): PlayerOptions.ATTACK,
+        str(i): PlayerOption.ATTACK,
     }
 
     i += 1
 
     if player.abilities:
-        options[str(i)] = PlayerOptions.ABILITIES
+        options[str(i)] = PlayerOption.ABILITIES
         i += 1
 
     if inventory.get_consumables():
-        options[str(i)] = PlayerOptions.ITEMS
+        options[str(i)] = PlayerOption.ITEMS
         i += 1
 
-    options[str(i)] = PlayerOptions.FLEE
+    options[str(i)] = PlayerOption.FLEE
 
     return options
 
 
-def generate_choice_prompt(printable_options):
-    pass
-
-
-def player_turn(inventory, player, enemy):
+def player_turn(
+    inventory: inv.Inventory, 
+    player: char.Combatant, 
+    enemy: char.NPCCombatant,
+    ) -> None:
     pf.print_status(player, enemy)
     player.turn_increment()
 
@@ -73,13 +86,19 @@ def player_turn(inventory, player, enemy):
             result = player_turn_selection(selection, inventory, player, enemy)
             
             if not result:
-                continue #TBD?
+                continue
+                #TODO unclear how / if I want to use the result bool.
             break
         else:
             print("Select one of the options.\n")
 
 
-def damage_flavor(original_hp_perc, new_hp_perc):
+def damage_flavor(
+        original_hp_perc: float, 
+        new_hp_perc: float,
+        ) -> None:
+    # TODO consider moving to print_formatting, and return a string.
+    # for consistency's sake.
     damage_delta = original_hp_perc - new_hp_perc
 
     flavor = ""
@@ -100,9 +119,16 @@ def damage_flavor(original_hp_perc, new_hp_perc):
         print(flavor)
     
 
-def player_turn_selection(selection, inventory, player, enemy):
+def player_turn_selection(
+        selection: PlayerOption, 
+        inventory: inv.Inventory, 
+        player: char.Combatant, 
+        enemy: char.NPCCombatant,
+        ) ->bool:
+    #TODO evaluate whether returning bool is necessary.
+
     match selection:
-        case PlayerOptions.ATTACK:
+        case PlayerOption.ATTACK:
             print(f"You attack the {enemy.name}.")
             damage = cf.player_attack(player, enemy)
 
@@ -111,7 +137,7 @@ def player_turn_selection(selection, inventory, player, enemy):
             
             return True
 
-        case PlayerOptions.ABILITIES:
+        case PlayerOption.ABILITIES:
             chosen_ability = ability_selection(player)
 
             if not chosen_ability:
@@ -124,7 +150,7 @@ def player_turn_selection(selection, inventory, player, enemy):
 
             return True
 
-        case PlayerOptions.ITEMS:
+        case PlayerOption.ITEMS:
             item = inventory_selection(inventory)
             
             if not item:
@@ -135,14 +161,14 @@ def player_turn_selection(selection, inventory, player, enemy):
             print(message)
             return True
 
-        case PlayerOptions.FLEE:
+        case PlayerOption.FLEE:
             #TODO Implement fleeing logic.
             # Need to first implement a concept of location.
             print("There is no fleeing from this fight.")
             return False
     
 
-def ability_selection(player):
+def ability_selection(player: char.Combatant) -> abs.Ability:
     while True:
         abilities_list = player.get_abilities() # gets list of ability objects.
         abilities_selection_dict = pf.generate_selection_dict(abilities_list) # Used to compare against player input in order to determine which ability was selected.
@@ -174,16 +200,7 @@ def ability_selection(player):
     return chosen_ability
 
 
-def display_inventory_items(aggregated_items):
-    # not used currently.
-    print_output = "Your inventory contains:\n"
-    for item_name, count in sorted(aggregated_items.items()):
-        print_output += f"{item_name} x{count}\n"
-    
-    print(print_output)
-
-
-def inventory_selection(inventory):
+def inventory_selection(inventory: inv.Inventory) -> tls.Consumable:
     while True:
         consumables = inventory.get_consumables()
         if not consumables:
@@ -215,11 +232,20 @@ def inventory_selection(inventory):
         
         
     item_id = selection_dict[player_choice][2]
+    # Note: select by ID is inconsistent w/ how I've set up ability selection.
+    # TODO Rework this to directly select the item vs. selecting by ID, in order to be consistent w/ ability selection.
+
+
     retrieved_item = inventory.get_item_by_id(item_id)
     return retrieved_item
 
 
-def aggregated_inventory_selection_dict(aggregated_items):
+def aggregated_inventory_selection_dict(
+        aggregated_items: dict[str, list[int, uuid.UUID]],
+        ) -> dict[str, list[str, int, uuid.UUID]]:
+    
+    # TODO need to go back through inventory selection logic and make all consistent w/ ability selection logic.
+    # TODO also need to move some of this to print formatting, I think.
     selection_dict = {}
     i = 1
     for item_name, value_list in sorted(aggregated_items.items()):
@@ -231,7 +257,9 @@ def aggregated_inventory_selection_dict(aggregated_items):
     return selection_dict
 
 
-def aggregate_inventory_items(items):
+def aggregate_inventory_items(
+        items: list[tls.Consumable]
+        ) -> dict[str, list[int, uuid.UUID]]:
     count_dict_with_ids = {}
 
     for item in items:
