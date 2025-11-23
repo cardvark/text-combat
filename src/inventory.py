@@ -1,4 +1,5 @@
-
+from __future__ import annotations
+import src.tools as tls
 
 class Inventory:
     def __init__(self, inventory_cap):
@@ -45,6 +46,7 @@ class Inventory:
             return False
         
         self.bag.append(item)
+        
         return True
 
     def get_item_by_id(self, item_id):
@@ -55,4 +57,9 @@ class Inventory:
                 return found_item
         
         return False
+    
+    def remove_item(self, item: tls.Environmental):
+        if item not in self.bag:
+            raise Exception("Selected item not in inventory.")
         
+        self.bag.remove(item)

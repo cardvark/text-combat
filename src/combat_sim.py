@@ -207,8 +207,7 @@ def inventory_selection(inventory: inv.Inventory) -> tls.Consumable:
             print("No usable items found!")
             return None
 
-        aggregated_consumables = aggregate_inventory_items(consumables)
-        selection_dict = aggregated_inventory_selection_dict(aggregated_consumables)
+        selection_dict = pf.generate_aggregated_selection_dict(consumables)
         num_options = len(selection_dict) + 1
         
         print("Select an option: \n")
@@ -231,42 +230,6 @@ def inventory_selection(inventory: inv.Inventory) -> tls.Consumable:
             print("Select one of the items.\n")
         
         
-    item_id = selection_dict[player_choice][2]
-    # Note: select by ID is inconsistent w/ how I've set up ability selection.
-    # TODO Rework this to directly select the item vs. selecting by ID, in order to be consistent w/ ability selection.
+    item = selection_dict[player_choice][2][0]
 
-
-    retrieved_item = inventory.get_item_by_id(item_id)
-    return retrieved_item
-
-
-def aggregated_inventory_selection_dict(
-        aggregated_items: dict[str, list[int, uuid.UUID]],
-        ) -> dict[str, list[str, int, uuid.UUID]]:
-    
-    # TODO need to go back through inventory selection logic and make all consistent w/ ability selection logic.
-    # TODO also need to move some of this to print formatting, I think.
-    selection_dict = {}
-    i = 1
-    for item_name, value_list in sorted(aggregated_items.items()):
-        count = value_list[0]
-        first_uid = value_list[1][0]
-        selection_dict[str(i)] = [item_name, count, first_uid]
-        i += 1
-
-    return selection_dict
-
-
-def aggregate_inventory_items(
-        items: list[tls.Consumable]
-        ) -> dict[str, list[int, uuid.UUID]]:
-    count_dict_with_ids = {}
-
-    for item in items:
-        if item.name in count_dict_with_ids:
-            count_dict_with_ids[item.name][0] += 1
-            count_dict_with_ids[item.name][1].append(item.uid)
-        else:
-            count_dict_with_ids[item.name] = [1, [item.uid]]
-        
-    return count_dict_with_ids
+    return item

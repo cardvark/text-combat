@@ -51,17 +51,20 @@ def get_consumables_item_list(
 
     return consumables_item_list
 
-
+# TODO update to also check and remove item from inventory
+# maybe.
 def use_consumable(
         user: char.Combatant, 
         item: tls.Consumable,
         ) -> int:
     if not item.is_consumable:
         raise Exception("Item is not a consumable.")
+    
+    effect = item.consumable_type
 
-    amount = item.amount
+    amount = item.use()
 
-    match item.consumable_type:
+    match effect:
         case EffectType.HEAL_DIRECT:
             user.restore_hp(amount)
         case EffectType.MP_DIRECT:

@@ -1,5 +1,6 @@
 from prettytable import PrettyTable, TableStyle
 from src.type_enums import *
+import src.tools as tls
 import random
 
 def print_status(player, enemy):
@@ -52,23 +53,39 @@ def generate_selection_dict(object_list, go_back=False):
 
     return selection_dict
 
-def generate_options_from_list(item_list, go_back=False):
+
+def generate_aggregated_selection_dict(
+        object_list: list[tls.Holdable],
+        ) -> dict[str, list[str, int, list[tls.Holdable]]]:
+    
+    count_dict = generate_aggregated_items(object_list)
+    selection_dict = {}
     i = 1
 
-    options = {}
+    for name, values in sorted(count_dict):
+        idx = str(i)
+        count = values[0]
+        items = values[1]
+        selection_dict[idx] = [name, count, items]
 
-    for item in item_list:
-        if isinstance(item, str):
-            item_name = item
-        else:
-            item_name = item.name
-        options[str(i)] = item_name
         i += 1
 
-    if go_back:
-        options[str(i)] = "Return to previous menu."
-    
-    return options
+    return selection_dict
+
+
+def generate_aggregated_items(
+        items: list[tls.Environmental]
+        ) -> dict[str, list[int, list[tls.Environmental]]]:
+    count_dict_with_ids = {}
+
+    for item in items:
+        if item.name in count_dict_with_ids:
+            count_dict_with_ids[item.name][0] += 1
+            count_dict_with_ids[item.name][1].append(item)
+        else:
+            count_dict_with_ids[item.name] = [1, [item]]
+        
+    return count_dict_with_ids
 
 
 def get_inventory_table(selection_dict):

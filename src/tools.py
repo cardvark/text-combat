@@ -1,7 +1,23 @@
+from __future__ import annotations
 from src.environmentals import Environmental
 from src.stat_calcs import *
+import src.inventory as inv
 
-class Equipment(Environmental):
+
+class Holdable(Environmental):
+    def __init__(self, name: str, description: str) -> None:
+        super().__init__(name, description)
+        self.inventory = None
+        self.is_holdable = True # items that can be placed in an inventory.
+    
+    def add_to_inventory(self, inventory: inv.Inventory) -> None:
+        self.inventory = inventory
+    
+    def remove_from_inventory(self) -> None:
+        self.inventory = None
+
+
+class Equipment(Holdable):
     def __init__(self, name, description, equip_type):
         super().__init__(name, description)
         self.equip_type = equip_type
@@ -16,10 +32,15 @@ class Weapon(Equipment):
         self.base_damage = base_damage
 
 
-class Consumable(Environmental):
+class Consumable(Holdable):
     def __init__(self, name, description):
         super().__init__(name, description)
         self.is_consumable = True
+
+    def use(self) -> int:
+        self.inventory.remove_item(self)
+        self.remove_from_inventory()
+        return self.amount
 
 
 class Potion(Consumable):
