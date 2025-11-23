@@ -23,14 +23,26 @@ class Holdable(Environmental):
 
 
 class Equipment(Holdable):
-    def __init__(self, name, description, equip_type):
+    def __init__(
+            self, 
+            name: str, 
+            description: str, 
+            equip_type: str, # TODO equip type to enum
+            ) -> None:
         super().__init__(name, description)
         self.equip_type = equip_type
         self.is_equippable = True
 
 
 class Weapon(Equipment):
-    def __init__(self, name, description, weapon_type, damage_type, base_damage):
+    def __init__(
+            self, 
+            name: str, 
+            description: str, 
+            weapon_type: str, # TODO weapon type enum 
+            damage_type: DamageType | ElementType, 
+            base_damage: int
+            ) -> None:
         super().__init__(name, description, "weapon")
         self.weapon_type = weapon_type
         self.damage_type = damage_type
@@ -38,7 +50,7 @@ class Weapon(Equipment):
 
 
 class Consumable(Holdable):
-    def __init__(self, name, description):
+    def __init__(self, name: str, description: str) -> None:
         super().__init__(name, description)
         self.is_consumable = True
 
@@ -48,7 +60,13 @@ class Consumable(Holdable):
 
 
 class Potion(Consumable):
-    def __init__(self, name, description, potion_type, amount):
+    def __init__(
+            self, 
+            name: str, 
+            description: str, 
+            potion_type: EffectType, 
+            amount: int
+            ) -> None:
         super().__init__(name, description)
         self.is_potion = True
         self.consumable_type = potion_type
