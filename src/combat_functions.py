@@ -96,6 +96,7 @@ def use_combatant_ability(
         case EffectType.DEBUFF:
             pass
         case EffectType.HEAL_DIRECT:
+            # TODO move to stat calcs; have an impact range?
             outcome = amount
             target.restore_hp(amount)
         case EffectType.HEAL_PERCENT:

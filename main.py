@@ -46,7 +46,7 @@ def main():
             "a massive, two-handed strike",
             2,
             EffectType.DMG_MULT,
-            2,
+            1.5,
             TargetType.OTHER,
             ResetType.BATTLE
         )

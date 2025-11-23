@@ -1,3 +1,4 @@
+from __future__ import annotations
 from prettytable import PrettyTable, TableStyle
 from src.type_enums import *
 import src.tools as tls

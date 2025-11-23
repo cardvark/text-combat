@@ -1,4 +1,8 @@
+from __future__ import annotations
 import random
+import src.characters as char
+import src.abilities as abs
+from src.type_enums import *
 
 BASE_HP = 30
 BASE_MP = 25
@@ -7,6 +11,17 @@ MP_PER_LEVEL = 3
 MISS_CHANCE = 0.125
 BASE_DAMAGE_MODIFIER = 1
 BASE_CHAR_DAMAGE = 5
+DAMAGE_RANGE_MIN = 0.7
+DAMAGE_RANGE_MAX = 1.3
+
+# to implement:
+# HEAL_RANGE_MIN = DAMAGE_RANGE_MIN
+# HEAL_RANGE_MAX = DAMAGE_RANGE_MAX
+
+def damage_amount_randomizer(base_damage: int) -> int:
+    damage = random.uniform(base_damage * DAMAGE_RANGE_MIN, base_damage * DAMAGE_RANGE_MAX)
+    
+    return int(damage)
 
 # TODO: Update jobs to enum.
 
@@ -32,24 +47,37 @@ mp_modifiers = {
 }
 
 
-def calc_max_hp(level, job):
+def calc_max_hp(
+          level: int, 
+          job: str, # TODO jobs to enums
+          ) -> int:
         base_hp = BASE_HP
         hp_per_level = HP_PER_LEVEL
         job_modifier = hp_modifiers[job]
         return int((base_hp + hp_per_level * level) * job_modifier)
 
-def calc_max_mp(level, job):
+def calc_max_mp(
+          level: int, 
+          job: str, # TODO jobs to enums
+          ) -> int:
         base_mp = BASE_MP
         mp_per_level = MP_PER_LEVEL
         job_modifier = mp_modifiers[job]
         return int((base_mp + mp_per_level * level) * job_modifier)
 
-def calculate_hit(character, target):
-    # TBD. Can add more stats to add some variability.
+def calculate_hit(
+          character: char.Combatant, 
+          target: char.Combatant,
+          ):
+    # TODO. Can add more stats to add some variability.
     hit = random.random()
     return hit > MISS_CHANCE
 
-def calculate_basic_attack_damage(character, target, dmg_mult=1):
+def calculate_basic_attack_damage(
+          character: char.Combatant, 
+          target: char.Combatant, 
+          dmg_mult: float = 1.0
+          ) -> int:
     char_weapon = character.main_equip
     weapon_damage = 0
     dmg_type = "blunt"
@@ -70,15 +98,29 @@ def calculate_basic_attack_damage(character, target, dmg_mult=1):
     if dmg_type in target.resistances:
         dmg_modifier += -0.5
     
-    total_damage = random.uniform(raw_total_damage / 2, raw_total_damage * 1.5) * dmg_modifier
+    total_damage = damage_amount_randomizer(raw_total_damage) * dmg_modifier
+
     return int(total_damage)
 
-def calculate_dmg_mult_ability_damage(ability, user, target):
+
+def calculate_dmg_mult_ability_damage(
+          ability: abs.Ability, 
+          user: char.Combatant, 
+          target: char.Combatant,
+          ) -> int:
+    
+    if ability.effect_type != EffectType.DMG_MULT:
+        raise Exception("Ability effect type is not DMG_MULT (damage multiplier).")
+    
     dmg_mult = ability.effect_amount
     return calculate_basic_attack_damage(user, target, dmg_mult)
 
 
-def calculate_ability_damage(base_damage, damage_type, target):
+def calculate_ability_damage(
+        base_damage: int, 
+        damage_type: int, 
+        target: char.Combatant
+        ) -> int:
     target_armor = target.chest_equip # does nothing yet.
 
     dmg_modifier = BASE_DAMAGE_MODIFIER
@@ -89,6 +131,7 @@ def calculate_ability_damage(base_damage, damage_type, target):
     if damage_type in target.resistances:
         dmg_modifier += -0.5
     
-    total_damage = random.uniform(base_damage / 2, base_damage * 1.5) * dmg_modifier
+    total_damage = damage_amount_randomizer(base_damage) * dmg_modifier
+
     return int(total_damage)
     
