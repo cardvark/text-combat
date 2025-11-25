@@ -5,7 +5,6 @@ import src.characters as char
 import src.inventory as inv
 import src.tools as tls
 import src.abilities as abs
-import uuid
 
 def check_hit(
         character: char.Combatant, 
@@ -44,8 +43,6 @@ def enemy_attack(
     return deal_basic_attack_damage(enemy, player)
 
 
-# TODO update to also check and remove item from inventory
-# maybe.
 def use_consumable(
         user: char.Combatant, 
         item: tls.Consumable,
@@ -54,7 +51,6 @@ def use_consumable(
         raise Exception("Item is not a consumable.")
     
     effect = item.consumable_type
-
     amount = item.use()
 
     match effect:
